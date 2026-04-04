@@ -17,6 +17,7 @@ const FeatureGrid = () => {
         </div>
       ),
     },
+    
     {
       icon: "🔗", title: "Instant session sharing",
       desc: "Share your workspace with a single link — no installs, no friction.",
