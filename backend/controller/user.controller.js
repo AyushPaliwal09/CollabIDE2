@@ -1,65 +1,92 @@
 import { User } from "../model/user.model.js"
 import bcrypt from "bcrypt"
 import { generateToken } from "../utiles/generateToken.js"
-export const signupController = async (req,res)=>{
+export const signupController = async (req, res) => {
     try {
-        const {username, email, password} = req.body
-        if(!username || !password ||!email){
-            return res.json({message:"All fields are required"})
+        const { username, email, password } = req.body
+        if (!username || !password || !email) {
+            return res.json({ message: "All fields are required" })
         }
-        const user = await User.findOne({email})
-        if(user){
-            return res.json({message:"User already exists"})
+        const user = await User.findOne({ email })
+        if (user) {
+            return res.json({ message: "User already exists" })
         }
-        const hashedPassword = await bcrypt.hash(password,10)
+        const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await User.create({
             username,
-            password:hashedPassword,
+            password: hashedPassword,
             email
         })
-        const token = await generateToken(user)
-        return res.json({message:"user created successfully", data:newUser, token:token})
+        const token = await generateToken(newUser)
+        return res.json({ message: "user created successfully", data: newUser, token: token })
     } catch (error) {
-        res.status(500).json({message:"Error in signupController",error: error.message})
+        res.status(500).json({ message: "Error in signupController", error: error.message })
         console.log("Error in signupController", error.message);
     }
 
 }
-export const loginController = async (req,res)=>{
+export const loginController = async (req, res) => {
     try {
-        const {email, password} = req.body
-        const user = await User.findOne({email})
-        if(!user){
-             return res.json({message:"User doesn't exist"})
+        const { email, password } = req.body
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.json({ message: "User doesn't exist" })
         }
-        const matchPassword = await bcrypt.compare(password,user.password)
+        const matchPassword = await bcrypt.compare(password, user.password)
         const token = await generateToken(user)
 
-        if(matchPassword && user){
-            return res.json({message:"Login succesfully", data:user, token:token})
+        if (matchPassword && user) {
+            return res.json({ message: "Login succesfully", data: user, token: token })
         }
 
     } catch (error) {
-        res.status(500).json({message:"Error in loginController",error: error.message})
+        res.status(500).json({ message: "Error in loginController", error: error.message })
         console.log("Error in loginController", error.message);
-        
+
     }
 }
-export const logoutController = async (req,res)=>{
+
+export const logoutController = async (req, res) => {
     try {
-        
+
+
     } catch (error) {
-        res.status(500).json({message:"Error in logoutController",error: error.message})
+        res.status(500).json({ message: "Error in logoutController", error: error.message })
         console.log("Error in logoutController", error.message);
-        
+
     }
 }
-export const deleteController = async (req,res)=>{
+export const deleteController = async (req, res) => {
     try {
-        
+
     } catch (error) {
-        res.status(500).json({message:"Error in deleteController",error: error.message})
+        res.status(500).json({ message: "Error in deleteController", error: error.message })
         console.log("Error in deleteController", error.message);
-        
+
+    }
+}
+
+
+export const changePasswordController = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body
+        if (!currentPassword || !newPassword) {
+            return res.json({ message: "Passwords are required" })
+        }
+        const user = await User.findById(req.user.Id).select("password")
+        if (!user) {
+            return res.json({ message: "no user found" })
+        }
+        const isMatch = await bcrypt.compare(currentPassword, user.password)
+        if (!isMatch) {
+            return res.json({
+                message: "Current password is incorrect"
+            });
+        }
+        user.password = await bcrypt.hash(newPassword, 10)
+        await user.save()
+    } catch (error) {
+        res.status(500).json({ message: "Error in changePasswordController", error: error.message })
+        console.log("Error in changePasswordController", error.message);
     }
 }

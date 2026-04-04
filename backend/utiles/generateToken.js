@@ -4,5 +4,5 @@ export const generateToken =  (user)=>{
     const token = jwt.sign({id:user._id, email:user.email}, process.env.SECRET_KEY,
         {expiresIn:"1d"}
     )
-    res.json({message:"Token created", token})
+    return token
 }

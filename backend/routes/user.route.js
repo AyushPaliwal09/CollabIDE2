@@ -1,5 +1,6 @@
 import express from "express"
 import {
+    changePasswordController,
     deleteController,
     loginController,
     logoutController,
@@ -11,6 +12,8 @@ router.post("/signup", signupController)
 router.post("/login", loginController)
 router.post("/logout", logoutController)
 router.post("/delete", deleteController)
+router.put("/update-password", changePasswordController)
+
 
 
 
