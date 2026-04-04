@@ -20,13 +20,11 @@ const Home = () => {
       <Navbar />
       <main>
         <Hero />
-        <TrustStrip />
         <Features />
         <FeatureGrid />
         <HowItWorks />
         <UseCases />
         <Testimonials />
-        {/* <Pricing /> */}
         <FAQ />
         <FinalCTA />
       </main>
