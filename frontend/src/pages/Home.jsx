@@ -1,0 +1,38 @@
+import React from 'react'
+import FinalCTA from '../components/FinalCTA.jsx'
+import FAQ from '../components/FAQ.jsx'
+import FeatureGrid from '../components/FeatureGrid.jsx'
+import Features from '../components/Features.jsx'
+import HowItWorks from '../components/HowItWorks.jsx'
+import Navbar from '../components/Navbar.jsx'
+import Pricing from '../components/Pricing.jsx'
+import Testimonials from '../components/Testimonials.jsx'
+import TrustStrip from '../components/TrustStrip.jsx'
+import UseCases from '../components/UseCases.jsx'
+import Hero from '../components/Hero.jsx'
+import Footer from '../components/Footer.jsx'
+
+
+
+const Home = () => {
+  return (
+    <div>
+      <Navbar />
+      <main>
+        <Hero />
+        <TrustStrip />
+        <Features />
+        <FeatureGrid />
+        <HowItWorks />
+        <UseCases />
+        <Testimonials />
+        {/* <Pricing /> */}
+        <FAQ />
+        <FinalCTA />
+      </main>
+      <Footer />
+    </div>
+  )
+}
+
+export default Home
