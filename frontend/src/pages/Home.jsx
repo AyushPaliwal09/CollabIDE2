@@ -5,9 +5,7 @@ import FeatureGrid from '../components/FeatureGrid.jsx'
 import Features from '../components/Features.jsx'
 import HowItWorks from '../components/HowItWorks.jsx'
 import Navbar from '../components/Navbar.jsx'
-import Pricing from '../components/Pricing.jsx'
 import Testimonials from '../components/Testimonials.jsx'
-import TrustStrip from '../components/TrustStrip.jsx'
 import UseCases from '../components/UseCases.jsx'
 import Hero from '../components/Hero.jsx'
 import Footer from '../components/Footer.jsx'
@@ -16,20 +14,21 @@ import Footer from '../components/Footer.jsx'
 
 const Home = () => {
   return (
-    <div>
-      <Navbar />
-      <main>
-        <Hero />
-        <Features />
-        <FeatureGrid />
-        <HowItWorks />
-        <UseCases />
-        <Testimonials />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-    </div>
+    <>
+    <Navbar />
+    <Hero />
+    <main className="main-container">
+      <Features />
+      <FeatureGrid />
+      <HowItWorks />
+      <UseCases />
+      <Testimonials />
+      <FAQ />
+      <FinalCTA />
+    </main>
+
+  <Footer />
+  </>
   )
 }
 
