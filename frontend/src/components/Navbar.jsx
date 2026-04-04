@@ -9,7 +9,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
  
-  const links = ["Features", "Demo", "Use Cases", "Pricing", "FAQ"];
+  const links = ["Features", "Demo", "Use Cases",  "FAQ"];
  
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center"
