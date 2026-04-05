@@ -10,6 +10,10 @@ const Navbar = () => {
   }, []);
  
   const links = ["Features", "Demo", "Use Cases",  "FAQ"];
+
+  const handleLogin = () => {
+    window.location.href = "/auth";
+  }
  
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center"
@@ -40,7 +44,7 @@ const Navbar = () => {
  
         {/* Right – desktop */}
         <div className="hidden md:flex items-center gap-3">
-          <button className="btn-ghost px-4 py-2 rounded-xl text-sm font-medium text-gray-300">Login</button>
+          <button className="btn-ghost px-4 py-2 rounded-xl text-sm font-medium text-gray-300" onClick={handleLogin}>Login</button>
           <button className="btn-primary px-5 py-2 rounded-xl text-sm font-semibold text-white">Get Started</button>
         </div>
  
