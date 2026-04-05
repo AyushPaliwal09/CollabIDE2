@@ -1,4 +1,5 @@
 import { Room } from "../model/room.model.js"
+import { User } from "../model/user.model.js"
 import mongoose from "mongoose"
 export const getRoomController = async (req, res) => {
     try {
@@ -15,6 +16,8 @@ export const getRoomController = async (req, res) => {
 }
 export const fetchRoomsController = async (req, res) => {
     try {
+        const rooms = await Room.find().populate("participants")
+        res.status(200).json(rooms)
     } catch (error) {
         res.status(500).json({ message: "Error in fetchRoomsController", error: error.message })
         console.log("Error in fetchRoomsController", error.message);
@@ -23,6 +26,8 @@ export const fetchRoomsController = async (req, res) => {
 export const createRoomController = async (req, res) => {
     try {
         const { roomName, description } = req.body
+        const { userId } = req
+        const user = await User.findOne({ _id: userId })
         if (!roomName || !description) {
             return res.json({ message: "Please fill the all fields" })
         }
@@ -31,7 +36,17 @@ export const createRoomController = async (req, res) => {
             return res.json({ message: "Room already exits. Please enter a different room name" })
         }
         const newRoom = await Room.create({ roomName, description })
-        newRoom.participants.push(req.user.id )
+        newRoom.participants.push(req.userId)
+        const roomObjectId = new mongoose.Types.ObjectId(newRoom._id);
+
+        const isAlreadyRoom = user.rooms.some(p => p && p.equals(roomObjectId)
+        );
+
+        if (isAlreadyRoom) {
+            return res.status(400).json({ message: "room already there" });
+        }
+        user.rooms.push(roomObjectId)
+        await user.save()
         await newRoom.save()
         return res.status(200).json({ message: "Room created ", data: newRoom })
     } catch (error) {
@@ -59,7 +74,7 @@ export const joinRoomController = async (req, res) => {
     try {
         const { roomId } = req.params;
         const { userId } = req;
-
+        const user = await User.findOne({_id:userId})
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
@@ -78,7 +93,16 @@ export const joinRoomController = async (req, res) => {
         if (isAlreadyJoined) {
             return res.status(400).json({ message: "User already in room" });
         }
+        const roomObjectId = new mongoose.Types.ObjectId(roomId);
 
+        const isAlreadyRoom = user.rooms.some(p => p && p.equals(roomObjectId)
+        );
+
+        if (isAlreadyRoom) {
+            return res.status(400).json({ message: "room already there" });
+        }
+        user.rooms.push(roomObjectId)
+        await user.save()
         room.participants.push(userObjectId);
         await room.save();
 

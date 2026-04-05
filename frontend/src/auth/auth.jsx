@@ -10,7 +10,7 @@ export default function Auth() {
  
       {/* Full page wrapper */}
       <div
-        className="auth-root grid-bg "
+        className="auth-root grid-bg h-full "
         style={{
           position: "relative",
           minHeight: "100svh",
@@ -63,9 +63,9 @@ export default function Auth() {
             minHeight: "100svh",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            // justifyContent: "center",
             alignItems: "center",
-            padding: "25px 48px",
+            padding: "24px 48px",
             position: "relative",
             zIndex: 2,
             /* subtle vertical divider */

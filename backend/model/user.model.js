@@ -13,6 +13,14 @@ const userSchema = mongoose.Schema({
         type:String,
         required:true
     },
+    rooms:
+        [
+           {
+             type:mongoose.Schema.Types.ObjectId,
+             ref:"Room"
+           }
+          
+        ]
     
 })
 
