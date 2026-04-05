@@ -1,5 +1,5 @@
 import { Room } from "../model/room.model.js"
-
+import mongoose from "mongoose"
 export const getRoomController = async (req, res) => {
     try {
         const { id } = req.params
@@ -53,32 +53,45 @@ export const deleteRoomController = async (req, res) => {
         console.log("Error in deleteRoomController", error.message);
     }
 }
+
+
 export const joinRoomController = async (req, res) => {
     try {
-        const { roomId } = req.params
-        const { userId } = req.user.id
-        const room = await Room.findOne({ roomId })
+        const { roomId } = req.params;
+        const { userId } = req;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const room = await Room.findOne({ roomId });
 
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
         }
-        console.log(room.participants.toObject());
-    // !   if(room.participants.includes(userId)) {
-    // !   return res.status(400).json({ message: "User already in the room" });
-    // !  }
-        if (room.participants.some(p => p.equals(userId))) {
+
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        const isAlreadyJoined = room.participants.some(p => p && p.equals(userObjectId)
+        );
+
+        if (isAlreadyJoined) {
             return res.status(400).json({ message: "User already in room" });
         }
-       
-        room.participants.push(userId)
-        await room.save()
-         res.status(200).json({
+
+        room.participants.push(userObjectId);
+        await room.save();
+
+        return res.status(200).json({
             message: "Joined room successfully",
-            data:room.participants
+            participants: room.participants
         });
 
     } catch (error) {
-        res.status(500).json({ message: "Error in joinRoomController", error: error.message })
         console.log("Error in joinRoomController", error.message);
+        return res.status(500).json({
+            message: "Error in joinRoomController",
+            error: error.message
+        });
     }
-}
+};
