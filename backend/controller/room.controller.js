@@ -31,6 +31,8 @@ export const createRoomController = async (req, res) => {
             return res.json({ message: "Room already exits. Please enter a different room name" })
         }
         const newRoom = await Room.create({ roomName, description })
+        newRoom.participants.push(req.user.id )
+        await newRoom.save()
         return res.status(200).json({ message: "Room created ", data: newRoom })
     } catch (error) {
         res.status(500).json({ message: "Error in createRoomController", error: error.message })
@@ -60,14 +62,19 @@ export const joinRoomController = async (req, res) => {
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
         }
-        if (room.participants.include(userId)) {
+        console.log(room.participants.toObject());
+    // !   if(room.participants.includes(userId)) {
+    // !   return res.status(400).json({ message: "User already in the room" });
+    // !  }
+        if (room.participants.some(p => p.equals(userId))) {
             return res.status(400).json({ message: "User already in room" });
         }
+       
         room.participants.push(userId)
         await room.save()
          res.status(200).json({
             message: "Joined room successfully",
-            room
+            data:room.participants
         });
 
     } catch (error) {
