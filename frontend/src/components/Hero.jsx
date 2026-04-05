@@ -15,6 +15,9 @@ const Hero = () => {
     { name: "Aman", color: "#8B5CF6", line: 3 },
     { name: "Sarah", color: "#EC4899", line: 5 },
   ];
+ const handleStarted = () => {
+  window.location.href = "/auth";
+ }
  
   return (
     <section className="relative min-h-screen flex items-center grid-bg overflow-hidden"
@@ -54,7 +57,7 @@ const Hero = () => {
           </p>
  
           <div className="flex flex-wrap items-center gap-4 mt-9 fade-up delay-4">
-            <button className="btn-primary pulse-glow px-7 py-3.5 rounded-xl font-semibold text-white text-sm">
+            <button onClick={handleStarted} className="btn-primary pulse-glow px-7 py-3.5 rounded-xl font-semibold text-white text-sm">
               Get Started Free
             </button>
             <button className="btn-ghost flex items-center gap-2 px-6 py-3.5 rounded-xl text-sm font-medium text-gray-300">
