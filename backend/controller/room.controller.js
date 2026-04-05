@@ -1,5 +1,6 @@
 import { Room } from "../model/room.model.js"
 import mongoose from "mongoose"
+import { User } from "../model/user.model.js"
 export const getRoomController = async (req, res) => {
     try {
         const { id } = req.params
@@ -15,6 +16,7 @@ export const getRoomController = async (req, res) => {
 }
 export const fetchRoomsController = async (req, res) => {
     try {
+        const {email} = req.body
     } catch (error) {
         res.status(500).json({ message: "Error in fetchRoomsController", error: error.message })
         console.log("Error in fetchRoomsController", error.message);
@@ -23,6 +25,7 @@ export const fetchRoomsController = async (req, res) => {
 export const createRoomController = async (req, res) => {
     try {
         const { roomName, description } = req.body
+        const { userId } = req
         if (!roomName || !description) {
             return res.json({ message: "Please fill the all fields" })
         }
@@ -31,7 +34,9 @@ export const createRoomController = async (req, res) => {
             return res.json({ message: "Room already exits. Please enter a different room name" })
         }
         const newRoom = await Room.create({ roomName, description })
-        newRoom.participants.push(req.user.id )
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        newRoom.participants.push(userObjectId)
         await newRoom.save()
         return res.status(200).json({ message: "Room created ", data: newRoom })
     } catch (error) {
@@ -41,30 +46,32 @@ export const createRoomController = async (req, res) => {
 }
 export const deleteRoomController = async (req, res) => {
     try {
-        const { roomName } = req.body
-        const room = await Room.findOne({ roomName })
+        const { id } = req.params
+        console.log(id);
+        const room = await Room.findOne({ _id:id  });
         if (!room) {
             return res.json({ message: "Room not found" })
         }
-        await Room.findByIdAndDelete(room._id)
-        res.json({ message: "Room deleted" })
+        console.log(room.id);
+        await Room.findByIdAndDelete({_id:id })
+        res.json({ message: "Room deleted"  })
     } catch (error) {
         res.status(500).json({ message: "Error in deleteRoomController", error: error.message })
         console.log("Error in deleteRoomController", error.message);
     }
 }
 
-
 export const joinRoomController = async (req, res) => {
     try {
-        const { roomId } = req.params;
+        const { id } = req.params;
         const { userId } = req;
-
+        console.log(id);
+        
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const room = await Room.findOne({ roomId });
+        const room = await Room.findOne({ _id:id });
 
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
@@ -78,9 +85,9 @@ export const joinRoomController = async (req, res) => {
         if (isAlreadyJoined) {
             return res.status(400).json({ message: "User already in room" });
         }
-
         room.participants.push(userObjectId);
         await room.save();
+
 
         return res.status(200).json({
             message: "Joined room successfully",
