@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import AuthForm from "../components/AuthForm.jsx";
 import BackgroundBlobs from "../components/ui/BackgroundBlobs.jsx";
 import Preview from "../components/ui/Preview.jsx";
-
+import axios from "axios"
 export default function Auth() {
+
   return (
     <>
       

@@ -36,7 +36,7 @@ const Hero = () => {
         filter: "blur(40px)", pointerEvents: "none"
       }} />
  
-      <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-12 items-center py-8">
+      <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-12 items-center py-20">
         {/* LEFT */}
         <div>
           <div className="fade-up delay-1 mb-6">

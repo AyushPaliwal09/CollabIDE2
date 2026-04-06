@@ -1,16 +1,35 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Logo from "./ui/Logo.jsx";
+import { AuthContext } from "../context/AuthContext.jsx"
 import { EyeOpen, EyeClosed, GoogleIcon, GithubIcon } from "./ui/Icons.jsx";
+
 const AuthForm = () => {
+
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [showPass, setShowPass] = useState(false);
+  const [user, setUser] = useState({ username: "", password: "", email: "" })
   const isLogin = mode === "login";
- 
+  const { login, signup } = useContext(AuthContext)
   // pill indicator width/position
   const pillStyle = isLogin
     ? { left: 4, width: "calc(50% - 4px)" }
     : { left: "calc(50%)", width: "calc(50% - 4px)" };
- 
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value })
+  }
+  const handleSubmit = async (e) => {
+    if (isLogin) {
+      await login(user.email, user.password)
+      console.log(user);
+      
+    }
+    else {
+      await signup(user.username, user.email, user.password)
+      console.log(user);
+
+    }
+
+  }
   return (
     <div style={{
       width: "100%",
@@ -19,12 +38,12 @@ const AuthForm = () => {
       flexDirection: "column",
       gap: 0,
     }}>
- 
+
       {/* ── Logo ── */}
       <div className="fade-up delay-1" style={{ marginBottom: 32 }}>
         <Logo />
       </div>
- 
+
       {/* ── Title + Subtitle ── */}
       <div className="fade-up delay-2" style={{ marginBottom: 28 }}>
         <h1 className="font-display font-extrabold" style={{
@@ -42,7 +61,7 @@ const AuthForm = () => {
             : "Start collaborating in seconds."}
         </p>
       </div>
- 
+
       {/* ── Toggle: Login / Sign Up ── */}
       <div className="fade-up delay-2" style={{ marginBottom: 28 }}>
         <div className="toggle-wrap" style={{ position: "relative" }}>
@@ -60,10 +79,10 @@ const AuthForm = () => {
           >Sign Up</button>
         </div>
       </div>
- 
+
       {/* ── Form Fields ── */}
       <div className="fade-up delay-3" style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 }}>
- 
+
         {/* Username — signup only */}
         {!isLogin && (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -73,13 +92,16 @@ const AuthForm = () => {
             <div className="input-wrap">
               <input
                 className="auth-input"
+                name="username"
+                value={user.username}
+                onChange={handleChange}
                 type="text"
                 placeholder="yourhandle"
               />
             </div>
           </div>
         )}
- 
+
         {/* Email */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <label style={{ fontSize: "0.8rem", color: "#9CA3AF", fontWeight: 500, letterSpacing: "0.02em" }}>
@@ -89,11 +111,14 @@ const AuthForm = () => {
             <input
               className="auth-input"
               type="email"
+              name="email"
+              value={user.email}
+              onChange={handleChange}
               placeholder="you@example.com"
             />
           </div>
         </div>
- 
+
         {/* Password */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -107,7 +132,10 @@ const AuthForm = () => {
           <div className="input-wrap">
             <input
               className="auth-input"
+              name="password"
               type={showPass ? "text" : "password"}
+              value={user.password}
+              onChange={handleChange}
               placeholder={isLogin ? "••••••••" : "Min. 8 characters"}
               style={{ paddingRight: 40 }}
             />
@@ -117,11 +145,13 @@ const AuthForm = () => {
           </div>
         </div>
       </div>
- 
+
       {/* ── Primary CTA ── */}
       <div className="fade-up delay-4" style={{ marginBottom: 20 }}>
         <button
           className="btn-primary pulse-glow"
+          type="submit"
+          onClick={handleSubmit}
           style={{
             width: "100%",
             padding: "13px 0",
@@ -133,7 +163,7 @@ const AuthForm = () => {
           {isLogin ? "Login" : "Create Account"}
         </button>
       </div>
- 
+
       {/* ── OR divider ── */}
       <div className="fade-up delay-4" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <div className="or-line" />
@@ -142,7 +172,7 @@ const AuthForm = () => {
         </span>
         <div className="or-line" />
       </div>
- 
+
       {/* ── Social Login ── */}
       <div className="fade-up delay-5" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
         <button className="social-btn">
@@ -154,7 +184,7 @@ const AuthForm = () => {
           Continue with GitHub
         </button>
       </div>
- 
+
       {/* ── Bottom link ── */}
       <div className="fade-up delay-6" style={{ textAlign: "center", fontSize: "0.83rem", color: "#6B7280" }}>
         {isLogin ? (
@@ -167,7 +197,7 @@ const AuthForm = () => {
           </>
         )}
       </div>
- 
+
       {/* ── Trust badges ── */}
       <div className="fade-up delay-6" style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 28, flexWrap: "wrap" }}>
         {[
