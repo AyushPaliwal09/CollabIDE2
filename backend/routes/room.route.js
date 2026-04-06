@@ -13,7 +13,7 @@ const router = express.Router()
 router.get("/get-room/:id",protect, getRoomController)
 router.post("/fetch-rooms", protect,fetchRoomsController)
 router.post("/create-room",protect, createRoomController)
-router.delete("/delete-room/:id", deleteRoomController)
+router.delete("/delete-room/:id",protect, deleteRoomController)
 router.post("/join-room/:id",protect, joinRoomController)
 
 

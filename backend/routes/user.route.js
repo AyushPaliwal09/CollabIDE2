@@ -11,11 +11,11 @@ import { protect } from "../middleware/middleware.js"
 
 const router = express.Router()
 router.get("/get-user/:id",protect, getUserController)
-router.post("/signup", signupController)
+router.post("/signup",signupController)
 router.post("/login", loginController)
-router.post("/logout", logoutController)
-router.post("/delete/:id", deleteController)
-router.put("/update-password", changePasswordController)
+router.post("/logout", protect,logoutController)
+router.post("/delete/:id",protect, deleteController)
+router.put("/update-password", protect,changePasswordController)
 
 
 

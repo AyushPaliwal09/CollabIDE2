@@ -1,21 +1,26 @@
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 
 const roomSchema = mongoose.Schema({
-    roomName :{
-        type:String,
-        required:true
+    roomName: {
+        type: String,
+        required: true
     },
-    description :{
-        type:String,
-        required:true
+    description: {
+        type: String,
+        required: true
     },
-    participants :[
-       {
-         type:mongoose.Schema.Types.ObjectId,
+    participants: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+    admin:{
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
-       }
-],
-}, {timestamps:true})
+    },
+    
+}, { timestamps: true })
 
 
 export const Room = mongoose.model("Room", roomSchema)

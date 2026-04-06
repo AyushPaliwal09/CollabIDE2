@@ -72,7 +72,6 @@ export const getUserController = async (req, res) => {
         console.log("Error in getUserController", error.message)
     }
 }
-
 export const logoutController = async (req, res) => {
     try {
         res.cookie("token","", {
@@ -86,7 +85,6 @@ export const logoutController = async (req, res) => {
 
     }
 }
-
 export const deleteController = async (req, res) => {
     try {
        const userId = req.params.id
@@ -102,8 +100,6 @@ export const deleteController = async (req, res) => {
 
     }
 }
-
-
 export const changePasswordController = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body
