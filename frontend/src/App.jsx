@@ -4,6 +4,9 @@ import Home from './pages/Home.jsx'
 import Auth from './auth/auth.jsx'
 import {Routes, Route} from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+
+
 
 
 function App() {
@@ -15,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
        </div>
      </AuthProvider>
