@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard.jsx'
 
 import { AuthProvider } from './context/AuthContext.jsx'
 
-
 function App() {
 
   return (
