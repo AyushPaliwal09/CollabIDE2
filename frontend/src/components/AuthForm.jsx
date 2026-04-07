@@ -1,9 +1,12 @@
 import { useContext, useState } from "react";
 import Logo from "./ui/Logo.jsx";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx"
 import { EyeOpen, EyeClosed, GoogleIcon, GithubIcon } from "./ui/Icons.jsx";
 
 const AuthForm = () => {
+
+  const navigate = useNavigate()  
 
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [showPass, setShowPass] = useState(false);
@@ -20,11 +23,13 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     if (isLogin) {
       await login(user.email, user.password)
+      navigate("/dashboard")
       console.log(user);
       
     }
     else {
       await signup(user.username, user.email, user.password)
+            navigate("/dashboard")
       console.log(user);
 
     }

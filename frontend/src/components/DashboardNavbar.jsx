@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Logo from "./ui/Logo.jsx";
 import {SearchIcon, PlusIcon, LinkIcon, SettingsIcon} from "./ui/Icons.jsx";
-import ProfileDropdown from "./ProfileDropDown.jsx";
+import ProfileDropdown from "./components/ProfileDropDown.jsx";
 const DashboardNavbar = ({ onCreateRoom, onJoinRoom, onSettings }) => {
   const [searchVal, setSearchVal] = useState("");
   const [showProfile, setShowProfile] = useState(false);
