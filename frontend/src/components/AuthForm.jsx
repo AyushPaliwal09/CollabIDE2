@@ -24,12 +24,10 @@ const AuthForm = () => {
       await login(user.email, user.password)
      navigate("/dashboard")
       console.log(user);
-      
     }
     else {
       await signup(user.username, user.email, user.password)
       navigate("/dashboard")
-
       console.log(user);
 
     }

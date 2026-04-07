@@ -1,9 +1,36 @@
 import { useState } from "react"; 
 import { CloseIcon } from "./ui/Icons.jsx";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
-const CreateRoomModal = ({ onClose }) => (
-  <div className="db-modal-backdrop" onClick={onClose}>
+const CreateRoomModal = ({ onClose }) => {
+  const [roomData, setRoomData] = useState({roomName:"", description:""})
+  const navigate = useNavigate()
+  const handleChange = (e)=>{
+    setRoomData({...roomData, [e.target.name]:e.target.value})
+  }
+  const handleSubmit=async()=>{
+    try {
+      const res = await axios.post("http://localhost:5000/room/create-room",{
+       roomName: roomData.roomName,
+       description: roomData.description,
+      },
+      {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    }
+  )
+      console.log(res.data)
+      navigate("/room/roompage")
+    } catch (error) {
+      console.log("error in createroom", error.message);
+      
+    }
+  }
+return(
+    <div className="db-modal-backdrop" onClick={onClose}>
     <div className="db-modal" onClick={e => e.stopPropagation()}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
@@ -26,14 +53,14 @@ const CreateRoomModal = ({ onClose }) => (
           <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}>
             Room name
           </label>
-          <input className="db-modal-input" type="text" placeholder="e.g. auth-refactor" />
+          <input className="db-modal-input" name="roomName" onChange={handleChange} value={roomData.roomName} type="text" placeholder="e.g. auth-refactor" />
         </div>
  
         <div>
           <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}>
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>
-          <textarea className="db-modal-input" rows={3} placeholder="Describe what you're building…" />
+          <textarea className="db-modal-input" name="description"   value={roomData.description} onChange={handleChange} rows={3} placeholder="Describe what you're building…" />
         </div>
  
         <div>
@@ -54,12 +81,13 @@ const CreateRoomModal = ({ onClose }) => (
           style={{ flex: 1, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Cancel
         </button>
-        <button className="btn-primary pulse-glow" onClick={onClose}
+        <button className="btn-primary pulse-glow" onClick={handleSubmit}
           style={{ flex: 2, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Create Room
         </button>
       </div>
     </div>
   </div>
-);
+)
+}
 export default CreateRoomModal;
