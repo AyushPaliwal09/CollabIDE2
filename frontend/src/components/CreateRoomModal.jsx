@@ -2,7 +2,19 @@ import { useState } from "react";
 import { CloseIcon } from "./ui/Icons.jsx";
 
 
-const CreateRoomModal = ({ onClose }) => (
+const CreateRoomModal = ({ onClose }) => {
+  const [roomName, setRoomName] = useState("");
+  const [roomDescription, setRoomDescription] = useState("");
+
+  const handleCreateRoom = async () => {
+    const response = await axois.post("http://localhost:5000/room/create-room", {
+      name: roomName,
+      description: roomDescription
+    });
+  }
+
+
+  return (
   <div className="db-modal-backdrop" onClick={onClose}>
     <div className="db-modal" onClick={e => e.stopPropagation()}>
       {/* Header */}
@@ -30,7 +42,11 @@ const CreateRoomModal = ({ onClose }) => (
         </div>
  
         <div>
-          <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}>
+          <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}
+            name="description"
+            value={roomDescription}
+            onChange={e => setRoomDescription(e.target.value)}
+          >
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>
           <textarea className="db-modal-input" rows={3} placeholder="Describe what you're building…" />
@@ -54,12 +70,13 @@ const CreateRoomModal = ({ onClose }) => (
           style={{ flex: 1, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Cancel
         </button>
-        <button className="btn-primary pulse-glow" onClick={onClose}
+        <button className="btn-primary pulse-glow" onClick={handleCreateRoom}
           style={{ flex: 2, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Create Room
         </button>
       </div>
     </div>
   </div>
-);
+  );
+};
 export default CreateRoomModal;
