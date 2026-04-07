@@ -16,9 +16,14 @@ export const getRoomController = async (req, res) => {
 }
 export const fetchRoomsController = async (req, res) => {
     try {
-        const rooms = await Room.find().populate("participants")
+        const {userId} = req
+       const user = await User.findById(userId)
+       console.log(userId);
+       
+        const rooms = user.rooms
         res.status(200).json(rooms)
-        const { email } = req.body
+       console.log(rooms);
+       
     } catch (error) {
         res.status(500).json({ message: "Error in fetchRoomsController", error: error.message })
         console.log("Error in fetchRoomsController", error.message);
@@ -38,7 +43,6 @@ export const createRoomController = async (req, res) => {
             return res.json({ message: "Room already exits. Please enter a different room name" })
         }
         const newRoom = await Room.create({ roomName, description ,admin})
-        newRoom.participants.push(req.userId)
         const roomObjectId = new mongoose.Types.ObjectId(newRoom._id);
 
         const isAlreadyRoom = user.rooms.some(p => p && p.equals(roomObjectId)

@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import Logo from "./ui/Logo.jsx";
 import { AuthContext } from "../context/AuthContext.jsx"
 import { EyeOpen, EyeClosed, GoogleIcon, GithubIcon } from "./ui/Icons.jsx";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = () => {
 
@@ -9,6 +10,7 @@ const AuthForm = () => {
   const [showPass, setShowPass] = useState(false);
   const [user, setUser] = useState({ username: "", password: "", email: "" })
   const isLogin = mode === "login";
+  const navigate = useNavigate();
   const { login, signup } = useContext(AuthContext)
   // pill indicator width/position
   const pillStyle = isLogin
@@ -20,11 +22,14 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     if (isLogin) {
       await login(user.email, user.password)
+     navigate("/dashboard")
       console.log(user);
       
     }
     else {
       await signup(user.username, user.email, user.password)
+      navigate("/dashboard")
+
       console.log(user);
 
     }
