@@ -20,18 +20,21 @@ const AuthForm = () => {
     setUser({ ...user, [e.target.name]: e.target.value })
   }
   const handleSubmit = async (e) => {
+    let result
     if (isLogin) {
-      await login(user.email, user.password)
-     navigate("/dashboard")
+      result = await login(user.email, user.password)
       console.log(user);
     }
     else {
-      await signup(user.username, user.email, user.password)
-      navigate("/dashboard")
+      result = await signup(user.username, user.email, user.password)
       console.log(user);
-
     }
-
+    console.log("result is",result)
+    if (result.success) {
+      navigate("/dashboard")
+    } else {
+      alert(result.message.message || "Something went wrong")
+    }
   }
   return (
     <div style={{
@@ -152,7 +155,7 @@ const AuthForm = () => {
       {/* ── Primary CTA ── */}
       <div className="fade-up delay-4" style={{ marginBottom: 20 }}>
         <button
-          className="btn-primary pulse-glow"
+          className="btn-primary pulse-glow cursor-pointer"
           type="submit"
           onClick={handleSubmit}
           style={{

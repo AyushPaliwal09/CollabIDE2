@@ -23,8 +23,6 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/room/join-room/:id" element={<JoinRoomModal />} />
           <Route path="/room/roompage" element={<RoomPage />} />
-
-
         </Routes>
        </div>
      </AuthProvider>
