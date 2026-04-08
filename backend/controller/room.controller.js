@@ -16,14 +16,14 @@ export const getRoomController = async (req, res) => {
 }
 export const fetchRoomsController = async (req, res) => {
     try {
-        const {userId} = req
-       const user = await User.findById(userId)
-       console.log(userId);
-       
+        const { userId } = req
+        const user = await User.findById(userId)
+        console.log(userId);
+
         const rooms = user.rooms
         res.status(200).json(rooms)
-       console.log(rooms);
-       
+        console.log(rooms);
+
     } catch (error) {
         res.status(500).json({ message: "Error in fetchRoomsController", error: error.message })
         console.log("Error in fetchRoomsController", error.message);
@@ -42,7 +42,7 @@ export const createRoomController = async (req, res) => {
         if (room) {
             return res.json({ message: "Room already exits. Please enter a different room name" })
         }
-        const newRoom = await Room.create({ roomName, description ,admin})
+        const newRoom = await Room.create({ roomName, description, admin })
         const roomObjectId = new mongoose.Types.ObjectId(newRoom._id);
 
         const isAlreadyRoom = user.rooms.some(p => p && p.equals(roomObjectId)
@@ -72,7 +72,7 @@ export const deleteRoomController = async (req, res) => {
         const admin = room.admin
         console.log(admin);
 
-        
+
         if (userId == admin) {
             await Room.findByIdAndDelete({ _id: id })
             return res.json({ message: "Room deleted" })
@@ -136,3 +136,20 @@ export const joinRoomController = async (req, res) => {
         });
     }
 };
+
+export const roomPageController = async (req, res) => {
+    try {
+        const { id } = req.params
+        const room = await Room.findById({ _id: id })
+        if (!room) {
+            return res.status(404).json({ messaeg: "Room not found." })
+        }
+        res.status(200).json(room)
+    } catch (error) {
+        console.log("Error in roomPageController", error.message);
+        return res.status(500).json({
+            message: "Error in roomPageController",
+            error: error.message
+        });
+    }
+}

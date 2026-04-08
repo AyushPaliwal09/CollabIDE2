@@ -1,16 +1,24 @@
-import { useEffect, useRef } from "react";
-import {useState} from "react";
+import { useEffect, useRef, useContext } from "react";
 import { UserIcon, SettingsIcon, LogOutIcon } from "./ui/Icons.jsx";
-
+import { AuthContext } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 const ProfileDropdown = ({ onClose }) => {
   const ref = useRef(null);
- 
+ const navigate = useNavigate()
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
+
+  const {logout} = useContext(AuthContext);
  
+  const handleLogout = () =>
+  {
+   logout()
+   navigate("/")
+
+  }
   return (
     <div ref={ref} className="db-dropdown">
       {/* User info */}
@@ -41,7 +49,7 @@ const ProfileDropdown = ({ onClose }) => {
  
       <div className="db-sep" />
  
-      <div className="db-dropdown-item danger" onClick={onClose}>
+      <div className="db-dropdown-item danger" onClick={handleLogout}>
         <span style={{ flexShrink: 0 }}><LogOutIcon /></span>
         Logout
       </div>

@@ -99,7 +99,7 @@ export default function Dashboard() {
  
       {/* ── Modals ── */}
       {modal === "create"   && <CreateRoomModal  onClose={closeModal} />}
-      {modal === "join"     && <JoinRoomModal    onClose={closeModal} />}
+      {modal === "join"     && <JoinRoomModal    onClose={closeModal}  />}
       {modal === "settings" && <SettingsModal    onClose={closeModal} />}
 
       {/* ── Footer ── */}

@@ -1,9 +1,27 @@
+import { useState } from "react";
 import { CloseIcon } from "./ui/Icons.jsx";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 
-const JoinRoomModal = ({onClose}) => (
-<>
-  <div className="db-modal-backdrop" onClick={onClose}>
+const JoinRoomModal = ({onClose}) => {
+  const [join, setJoin] = useState("")
+   const { roomId } = useParams()
+  const navigate = useNavigate()
+  const handleJoin = async ()=>{
+   try {
+    const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
+    console.log(res.data);
+    
+     navigate("/login")
+   }catch (error) {
+        console.log(error)
+        alert("Invalid or expired room link")
+      }
+  }
+return (
+  <>
+  <div className="db-modal-backdrop" >
     <div className="db-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 400 }}>
       <div style = {{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div>
@@ -34,7 +52,7 @@ const JoinRoomModal = ({onClose}) => (
           style={{ flex: 1, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Cancel
         </button>
-        <button className="btn-primary pulse-glow" onClick={onClose}
+        <button className="btn-primary pulse-glow" onClick={handleJoin}
           style={{ flex: 2, padding: "10px 0", borderRadius: 9, fontSize: "0.85rem" }}>
           Join Room
         </button>
@@ -42,6 +60,7 @@ const JoinRoomModal = ({onClose}) => (
     </div>
   </div>
 </>
-
 )
+
+}
 export default JoinRoomModal

@@ -37,13 +37,13 @@ export const loginController = async (req, res) => {
         const { email, password } = req.body
         const user = await User.findOne({ email })
         if (!user) {
-            return res.json({ message: "User doesn't exist" })
+            return res.status(500).json({ message: "User doesn't exist" })
         }
         const matchPassword = await bcrypt.compare(password, user.password)
         const token = await generateToken(user, res)
 
         if (matchPassword && user) {
-            return res.json({
+            return res.status(200).json({
                 message: "Login succesfully", user: {
                     id: user._id,
                     username: user.username,
