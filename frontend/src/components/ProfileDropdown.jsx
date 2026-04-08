@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
+import {useState} from "react";
 import { UserIcon, SettingsIcon, LogOutIcon } from "./ui/Icons.jsx";
+
 const ProfileDropdown = ({ onClose }) => {
   const ref = useRef(null);
  
@@ -47,3 +49,4 @@ const ProfileDropdown = ({ onClose }) => {
   );
 };
 export default ProfileDropdown;
+

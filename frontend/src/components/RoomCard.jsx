@@ -32,7 +32,7 @@ const RoomCard = ({ room, delay }) => (
         </span>
       )}
     </div>
- 
+
     {/* Description */}
     <p style={{
       fontSize: "0.78rem", color: "#6B7280", lineHeight: 1.55,
@@ -42,18 +42,31 @@ const RoomCard = ({ room, delay }) => (
     }}>
       {room.desc}
     </p>
- 
+
     {/* Footer */}
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span className={`db-tag ${room.langClass}`}>{room.lang}</span>
         <span style={{ fontSize: "0.68rem", color: "#374151" }}>{room.lastActive}</span>
       </div>
-      <button className="db-card-btn">
-        {room.live ? "Open" : "Resume"}
-      </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {/* Delete button */}
+        <button
+          onClick={e => e.stopPropagation()}
+          style={{
+            width: 26, height: 26, borderRadius: 7, border: "none",
+            background: "rgba(239,68,68,0.08)",
+            color: "#ef4444", cursor: "pointer", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 12, transition: "background 0.18s, transform 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
+        >🗑</button>
+        <button className="db-card-btn">{room.live ? "Open" : "Resume"}</button>
+      </div>
     </div>
   </div>
 );
- 
+
 export default RoomCard;
