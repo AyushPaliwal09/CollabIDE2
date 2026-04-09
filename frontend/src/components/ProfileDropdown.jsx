@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { UserIcon, SettingsIcon, LogOutIcon } from "./ui/Icons.jsx";
-const ProfileDropdown = ({ onClose }) => {
+const ProfileDropdown = ({ onClose, onSettings }) => {
   const ref = useRef(null);
  
   useEffect(() => {
@@ -31,7 +31,7 @@ const ProfileDropdown = ({ onClose }) => {
         { icon: <UserIcon />,     label: "Profile" },
         { icon: <SettingsIcon />, label: "Settings" },
       ].map((item, i) => (
-        <div key={i} className="db-dropdown-item" onClick={onClose}>
+        <div key={i} className="db-dropdown-item" onClick={onSettings}>
           <span style={{ color: "#6B7280", flexShrink: 0 }}>{item.icon}</span>
           {item.label}
         </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-import Navbar from "../components/DashboardNavbar.jsx";
 import DashboardHeader from "../components/DashboardHeader.jsx";
 import RoomCard from "../components/RoomCard.jsx";
 import EmptyState from "../components/EmptyState.jsx";
@@ -9,6 +8,7 @@ import SettingsModal from "../components/SettingModal.jsx";
 import  JoinRoomModal  from "../components/JoinRoomModal.jsx";
 import CreateRoomModal  from "../components/CreateRoomModal.jsx";
 import { ROOMS } from "../data/Room.js";
+import DashboardNavbar from "../components/DashboardNavbar.jsx";
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
   const [hasRooms, setHasRooms] = useState(true);        // toggle to false to see empty state
@@ -28,7 +28,7 @@ export default function Dashboard() {
      
  
       {/* ── Fixed navbar ── */}
-      <Navbar
+      <DashboardNavbar
         onCreateRoom={() => openModal("create")}
         onJoinRoom={()   => openModal("join")}
         onSettings={() => openModal("settings")}
