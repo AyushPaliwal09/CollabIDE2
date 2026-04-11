@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import Logo from "./ui/Logo.jsx";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx"
 import { EyeOpen, EyeClosed, GoogleIcon, GithubIcon } from "./ui/Icons.jsx";
 import { useNavigate } from "react-router-dom";

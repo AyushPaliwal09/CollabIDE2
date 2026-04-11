@@ -6,13 +6,14 @@ import Terminal from "../components/Terminal.jsx";
 import { FileCodeIcon, FilesIcon } from "../components/ui/Icons.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import Editor from "@monaco-editor/react";
-import { DEFAULT_CODE, MESSAGES, TABS } from "../data/MockData.js";
+import { DEFAULT_CODE, TABS } from "../data/MockData.js";
 import { useState, useEffect, useRef, useCallback } from "react";
 import SettingsModal from "../components/SettingModal.jsx";
 
 
 
 export default function Workspace() {
+  
   // ── Panel state ────────────────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarTab, setSidebarTab] = useState("users");

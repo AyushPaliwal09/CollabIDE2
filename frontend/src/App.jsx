@@ -19,8 +19,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/room/join-room/:id" element={<JoinRoomModal />} />
-          <Route path="/room/roompage" element={<RoomPage />} />
+          <Route path="/join-room/:id" element={<JoinRoomModal />} />
+          <Route path="/room/:id" element={<RoomPage />} />
         </Routes>
        </div>
      </AuthProvider>
