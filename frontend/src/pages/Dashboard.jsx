@@ -99,8 +99,46 @@ export default function Dashboard() {
  
       {/* ── Modals ── */}
       {modal === "create"   && <CreateRoomModal  onClose={closeModal} />}
-      {modal === "join"     && <JoinRoomModal    onClose={closeModal} />}
+      {modal === "join"     && <JoinRoomModal    onClose={closeModal}  />}
       {modal === "settings" && <SettingsModal    onClose={closeModal} />}
+
+      {/* ── Footer ── */}
+      <footer style={{
+        borderTop: "1px solid rgba(255,255,255,0.05)",
+        padding: "16px clamp(16px,3vw,32px)",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        flexWrap: "wrap", gap: 10,
+        background: "rgba(7,9,15,0.6)",
+        position: "relative", zIndex: 1,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Logo */}
+          <div style={{
+            width: 20, height: 20, borderRadius: 5,
+            background: "linear-gradient(135deg,#8B5CF6,#EC4899)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 9, fontWeight: 700, color: "#fff",
+            fontFamily: "JetBrains Mono, monospace",
+          }}>{"<>"}</div>
+          <span className="font-display grad-text" style={{ fontSize: "0.8rem", fontWeight: 700 }}>
+            CollabIDE
+          </span>
+          <span style={{ fontSize: "0.72rem", color: "#374151" }}>© 2026</span>
+        </div>
+
+        <div style={{ display: "flex", gap: 20 }}>
+          {["Docs", "Status", "Privacy", "Terms"].map(l => (
+            <a key={l} href="#" style={{
+              fontSize: "0.75rem", color: "#4B5563",
+              textDecoration: "none", transition: "color 0.18s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "#9CA3AF"}
+            onMouseLeave={e => e.currentTarget.style.color = "#4B5563"}>
+              {l}
+            </a>
+          ))}
+        </div>
+      </footer>
     </>
   );
 }
