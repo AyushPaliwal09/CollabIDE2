@@ -8,6 +8,7 @@ import JoinRoomModal from './components/JoinRoomModal.jsx'
 import RoomPage from './pages/RoomPage.jsx'
 
 import { AuthProvider } from './context/AuthContext.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 function App() {
 
@@ -18,9 +19,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/room/join-room/:id" element={<JoinRoomModal />} />
-          <Route path="/room/roompage" element={<RoomPage />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>
+          } />
+          <Route path="/room/join-room/:id" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
+          <Route path="/room/roompage" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
         </Routes>
        </div>
      </AuthProvider>
