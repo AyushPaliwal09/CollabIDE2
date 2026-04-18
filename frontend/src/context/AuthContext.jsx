@@ -6,25 +6,37 @@ export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    //const [token, setToken] = useState(null);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
     const [isLogin, setIsLogin] = useState(null)
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (token) {
+  async function  checkAuth()  {
+         if (token) {
+            try{
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            const res = axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true });
-            res.then((response) => {
-                setUser(response.data);
+            const res = await axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true })
+            
+                setUser(res.data);
                 setIsLogin(true);
-            });
+      
         }
+        catch(error){
+            delete axios.defaults.headers.common["Authorization"]
+            localStorage.removeItem("token");
+            setUser(null);
+            setIsLogin(false);
+            navigate("/auth");
+            console.log("Error fetching user data:", error.response?.data || error.message);
+        }
+    }
         else {
             delete axios.defaults.headers.common["Authorization"];
             setIsLogin(false);
             // navigate("/")
         }
+   }
+    checkAuth();
     }, [token]);
 
     const signup = async (username, email, password) => {
@@ -131,7 +143,6 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{ user, isLogin, token, login, logout, signup, firebaseLogin }}>
-
             {children}
         </AuthContext.Provider>
     );

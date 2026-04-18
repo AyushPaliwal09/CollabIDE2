@@ -9,6 +9,7 @@ import RoomPage from './pages/RoomPage.jsx'
 
 import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
           } />
           <Route path="/room/join-room/:id" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
           <Route path="/room/roompage" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
        </div>
      </AuthProvider>

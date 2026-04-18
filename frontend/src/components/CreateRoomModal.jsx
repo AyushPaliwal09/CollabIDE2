@@ -63,10 +63,7 @@ const CreateRoomModal = ({ onClose }) => {
 
         <div>
           <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}
-            name="description"
-            value={roomDescription}
-            onChange={e => setRoomDescription(e.target.value)}
-          >
+            name="description"  >
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>
           <textarea name="description"   value={roomData.description} onChange={handleChange}
