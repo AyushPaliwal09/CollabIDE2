@@ -17,7 +17,7 @@ export const getRoomController = async (req, res) => {
 export const fetchRoomsController = async (req, res) => {
     try {
         const { userId } = req
-        const user = await User.findById(userId)
+        const user = await User.findById(userId).populate("rooms")
         console.log(userId);
 
         const rooms = user.rooms
@@ -120,9 +120,8 @@ export const joinRoomController = async (req, res) => {
         user.rooms.push(roomObjectId)
         await user.save()
         room.participants.push(userObjectId);
+        room.activeUser.push(userObjectId);
         await room.save();
-
-
         return res.status(200).json({
             message: "Joined room successfully",
             participants: room.participants

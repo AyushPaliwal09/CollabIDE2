@@ -19,6 +19,11 @@ const roomSchema = mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
+    activeUser:[],
+    interviewBtn: {
+        type: Boolean,
+        default: false
+    }
     
 }, { timestamps: true })
 

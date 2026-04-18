@@ -1,6 +1,10 @@
+import { useEffect } from "react";
 import { UsersIcon } from "./ui/Icons.jsx";
 
 const RoomCard = ({ room, delay }) => (
+  // useEffect(() => );
+
+
   <div className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
     {/* Top row */}
     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
@@ -16,16 +20,16 @@ const RoomCard = ({ room, delay }) => (
         </div>
         <div>
           <div className="font-display font-semibold" style={{ fontSize: "0.88rem", color: "#F9FAFB", lineHeight: 1.2 }}>
-            {room.name}
+            {room.roomName}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 3 }}>
             <UsersIcon />
-            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.members} members</span>
+            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.participants.length+1} members</span>
           </div>
         </div>
       </div>
       {/* Live badge */}
-      {room.live && (
+      {room.activeUser.length>=1 && (
         <span className="db-tag live" style={{ flexShrink: 0 }}>
           <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
           live
@@ -40,7 +44,7 @@ const RoomCard = ({ room, delay }) => (
       display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
       overflow: "hidden",
     }}>
-      {room.desc}
+      {room.description || "No description provided."}
     </p>
 
     {/* Footer */}
@@ -70,3 +74,15 @@ const RoomCard = ({ room, delay }) => (
 );
 
 export default RoomCard;
+
+// import React from 'react'
+
+// const RoomCard = ({roomNameq}) => {
+//   return (
+//     <div>
+//       <h3 className='text-white'>{roomName}</h3>
+//     </div>
+//   )
+// }
+
+// export default RoomCard
