@@ -7,7 +7,8 @@ const userSchema = mongoose.Schema({
     },
     password:{
         type:String,
-        required:true
+        // required:true  
+        default:null // because for OAuth users, password will be null
     },
     email:{
         type:String,
@@ -20,7 +21,11 @@ const userSchema = mongoose.Schema({
              ref:"Room"
            }
           
-        ]
+        ],
+    uid:{
+        type:String, // for OAuth users, we will store the uid from the provider (Google/Github)
+        default:null  // because for normal users, uid will be null
+    }
     
 })
 

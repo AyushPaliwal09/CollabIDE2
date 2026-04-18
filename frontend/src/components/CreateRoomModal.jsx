@@ -12,6 +12,9 @@ const CreateRoomModal = ({ onClose }) => {
     setRoomData({...roomData, [e.target.name]:e.target.value})
   }
   const handleSubmit=async()=>{
+    if(!roomData.description || !roomData.roomName){
+      return alert("please fill all the fields")
+    }
     try {
       const res = await axios.post("http://localhost:5000/room/create-room",{
        roomName: roomData.roomName,
@@ -64,8 +67,6 @@ const CreateRoomModal = ({ onClose }) => {
         <div>
           <label style={{ fontSize: "0.76rem", color: "#6B7280", fontWeight: 500, display: "block", marginBottom: 5 }}
             name="description"
-            value={roomDescription}
-            onChange={e => setRoomDescription(e.target.value)}
           >
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>

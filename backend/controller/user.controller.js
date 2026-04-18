@@ -61,7 +61,7 @@ export const loginController = async (req, res) => {
 }
 export const getUserController = async (req, res) => {
     try {
-        const userId = req.params.id
+        const userId = req.params.id || req.userId; // Get user ID from params or from middleware
         const user = await User.findOne({ _id: userId })
         if (!user) {
             return res.json({ message: "User not found" })
@@ -123,3 +123,59 @@ export const changePasswordController = async (req, res) => {
         console.log("Error in changePasswordController", error.message);
     }
 }
+
+export const firebaseAuthController = async (req, res) => {
+    try {
+        const {username, email, uid } = req.body
+        let user = await User.findOne({ email })
+        if (!user) {
+            user = await User.create({
+                username,
+                email,
+                uid
+            });
+        }
+        const token = await generateToken(user, res)
+        return res.status(200).json({
+            message: "Login successfully",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                uid: user.uid
+            },
+            token: token
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error in firebaseAuthController", error: error.message })
+        console.log("Error in firebaseAuthController", error.message);
+    }
+}
+
+// export const loginByGithubController = async (req, res) => {
+//     try {
+//         const { username, email, uid } = req.body
+//         let user = await User.findOne({ email })
+//         if (!user) {
+//             user = await User.create({
+//                 username,
+//                 email,
+//                 uid
+//             });
+//         }
+//         const token = await generateToken(user, res)
+//         return res.status(200).json({
+//             message: "Login successfully",
+//             user: {
+//                 id: user._id,
+//                 username: user.username,
+//                 email: user.email,
+//                 uid: user.uid
+//             },
+//             token: token
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error in loginByGithubController", error: error.message })
+//         console.log("Error in loginByGithubController", error.message);
+//     }
+// }

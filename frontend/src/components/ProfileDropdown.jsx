@@ -1,8 +1,12 @@
-import { useEffect, useRef, useContext,useNavigate } from "react";
+import { useEffect, useRef, useContext } from "react";
 import { UserIcon, SettingsIcon, LogOutIcon } from "./ui/Icons.jsx";
-const ProfileDropdown = ({ onClose, onSettings }) => {
+import { AuthContext } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+// import {useAuth} from "../context/AuthContext.jsx";
+const ProfileDropdown = ({ onClose, onSettings}) => {
   const ref = useRef(null);
- const navigate = useNavigate()
+  const { user } = useContext(AuthContext);
+ const navigate = useNavigate();
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     document.addEventListener("mousedown", handler);
@@ -18,6 +22,7 @@ const ProfileDropdown = ({ onClose, onSettings }) => {
 
   }
   return (
+    <>
     <div ref={ref} className="db-dropdown">
       {/* User info */}
       <div style={{ padding: "10px 10px 8px", display: "flex", alignItems: "center", gap: 10 }}>
@@ -26,10 +31,10 @@ const ProfileDropdown = ({ onClose, onSettings }) => {
           background: "linear-gradient(135deg,#8B5CF6,#EC4899)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0,
-        }}>A</div>
+        }}>{user?.username?.charAt(0)?.toUpperCase() || <UserIcon />}</div>
         <div style={{ minWidth: 0 }}>
-          <div className="font-display font-semibold" style={{ fontSize: "0.82rem", color: "#F9FAFB", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Aman Verma</div>
-          <div style={{ fontSize: "0.72rem", color: "#4B5563", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>aman@collabide.dev</div>
+          <div className="font-display font-semibold" style={{ fontSize: "0.82rem", color: "#F9FAFB", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.username}</div>
+          <div style={{ fontSize: "0.72rem", color: "#4B5563", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{user?.email}</div>
         </div>
       </div>
  
@@ -52,6 +57,7 @@ const ProfileDropdown = ({ onClose, onSettings }) => {
         Logout
       </div>
     </div>
+    </>
   );
 };
 export default ProfileDropdown;

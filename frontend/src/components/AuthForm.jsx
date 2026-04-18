@@ -3,6 +3,7 @@ import Logo from "./ui/Logo.jsx";
 import { AuthContext } from "../context/AuthContext.jsx"
 import { EyeOpen, EyeClosed, GoogleIcon, GithubIcon } from "./ui/Icons.jsx";
 import { useNavigate } from "react-router-dom";
+import { loginWithGoogle, loginWithGithub } from "../services/AuthService.js";
 
 const AuthForm = () => {
   const [mode, setMode] = useState("login"); // "login" | "signup"
@@ -10,7 +11,7 @@ const AuthForm = () => {
   const [user, setUser] = useState({ username: "", password: "", email: "" })
   const isLogin = mode === "login";
   const navigate = useNavigate();
-  const { login, signup } = useContext(AuthContext)
+  const { login, signup, firebaseLogin } = useContext(AuthContext)
   // pill indicator width/position
   const pillStyle = isLogin
     ? { left: 4, width: "calc(50% - 4px)" }
@@ -35,6 +36,40 @@ const AuthForm = () => {
       alert(result.message.message || "Something went wrong")
     }
   }
+
+  const handleGoogleLogin = async () => {
+    try {
+      const userData=  await loginWithGoogle();
+      console.log("Google user data:", userData);
+     const result = await firebaseLogin(userData.username, userData.email, userData.uid, true);
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        alert(result.message.message || "Google login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      alert("Google login failed. Please try again.");
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      const userData=  await loginWithGithub();
+      console.log("GitHub user data:", userData);
+      const result = await firebaseLogin(userData.username, userData.email, userData.uid, true);
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        alert(result.message.message || "GitHub login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("GitHub login failed:", error);
+      alert("GitHub login failed. Please try again.");
+    }
+  };
+
+
   return (
     <div style={{
       width: "100%",
@@ -180,11 +215,11 @@ const AuthForm = () => {
 
       {/* ── Social Login ── */}
       <div className="fade-up delay-5" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-        <button className="social-btn">
+        <button className="social-btn" onClick={handleGoogleLogin}>
           <GoogleIcon />
           Continue with Google
         </button>
-        <button className="social-btn">
+        <button className="social-btn" onClick={handleGithubLogin}>
           <GithubIcon />
           Continue with GitHub
         </button>
