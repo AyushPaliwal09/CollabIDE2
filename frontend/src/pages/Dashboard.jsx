@@ -10,6 +10,7 @@ import CreateRoomModal  from "../components/CreateRoomModal.jsx";
 import { ROOMS } from "../data/Room.js";
 import DashboardNavbar from "../components/DashboardNavbar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
+
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
   const [hasRooms, setHasRooms] = useState(true);        // toggle to false to see empty state
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const closeModal = () => setModal(null);
   const {user} = useAuth();
   const [rooms, setRooms] = useState([]);
+  const [refreshRooms, setRefreshRooms] = useState(0);
+
   // close modal on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") closeModal(); };
@@ -27,13 +30,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchRooms() {
-      console.log("fetching rooms for user:", user);
-      const res = await axios.post(`http://localhost:5000/room/fetch-rooms/${user.id}`);
+      console.log("fetching rooms for user:", user._id);
+      const res = await axios.post(`http://localhost:5000/room/fetch-rooms/${user._id}`);
       setRooms(res.data);
       console.log("these are rooms",res.data);
+      setHasRooms(res.data.length > 0);
     }
     fetchRooms();
-  },[])
+  },[refreshRooms]);
  
   return (
     <>
@@ -93,6 +97,7 @@ export default function Dashboard() {
               {rooms.map((room, i) => (
                 <RoomCard room={room} delay={i}
                   key={room._id}
+                  setRefreshRooms={setRefreshRooms}
                   // roomName={room.roomName}
                          />
               ))}
@@ -107,8 +112,8 @@ export default function Dashboard() {
       </main>
  
       {/* ── Modals ── */}
-      {modal === "create"   && <CreateRoomModal  onClose={closeModal} />}
-      {modal === "join"     && <JoinRoomModal    onClose={closeModal}  />}
+      {modal === "create"   && <CreateRoomModal  onClose={closeModal} setRefreshRooms={setRefreshRooms} />}
+      {modal === "join"     && <JoinRoomModal    onClose={closeModal} setRefreshRooms={setRefreshRooms} />}
       {modal === "settings" && <SettingsModal    onClose={closeModal} />}
 
       {/* ── Footer ── */}

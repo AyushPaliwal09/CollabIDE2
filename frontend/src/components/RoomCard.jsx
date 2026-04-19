@@ -1,9 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UsersIcon } from "./ui/Icons.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import axios from "axios";
 
-const RoomCard = ({ room, delay }) => (
-  // useEffect(() => );
+const RoomCard = ({ room, delay, setRefreshRooms }) =>{
+  // const now = new Date();
+  // const lastActiveDate = new Date(room.lastActive);
+  // const diffMinutes = Math.floor((now - lastActiveDate) / 60000);
+  // let lastActiveText = "";
+  // if (diffMinutes < 1) {
+  //   lastActiveText = "Just now";
+  // } else if (diffMinutes < 60) {
+  //   lastActiveText = `${diffMinutes} minutes ago`;
+  // } else if (diffMinutes < 1440) {
+  //   lastActiveText = `${Math.floor(diffMinutes / 60)} hours ago`;
+  // } else {
+  //   lastActiveText = `${Math.floor(diffMinutes / 1440)} days ago`;
+  // }
+  // room.lastActive = lastActiveText;
+  const {user} = useAuth();
+  const deleteRoom = room.admin === user._id;
+  const handleDeleteRoom = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
+      setRefreshRooms(prev => prev + 1);
+      // alert("Room deleted successfully");
+    } catch (error) {
+      console.error("Error deleting room:", error);
+      alert("Failed to delete room");
 
+    }
+  };
+  return (
 
   <div className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
     {/* Top row */}
@@ -55,7 +83,8 @@ const RoomCard = ({ room, delay }) => (
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {/* Delete button */}
-        <button
+        {deleteRoom &&
+        <button 
           onClick={e => e.stopPropagation()}
           style={{
             width: 26, height: 26, borderRadius: 7, border: "none",
@@ -64,15 +93,16 @@ const RoomCard = ({ room, delay }) => (
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, transition: "background 0.18s, transform 0.15s",
           }}
+          onClick={handleDeleteRoom}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
-        >🗑</button>
+        >🗑</button>}
         <button className="db-card-btn">{room.live ? "Open" : "Resume"}</button>
       </div>
     </div>
   </div>
 );
-
+}
 export default RoomCard;
 
 // import React from 'react'
