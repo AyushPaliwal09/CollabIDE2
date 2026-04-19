@@ -16,7 +16,7 @@ const JoinRoomModal = ({onClose, setRefreshRooms}) => {
     console.log(res);
 
     setRefreshRooms(prev => prev + 1);
-     navigate("/room/roompage/")
+     navigate("/room/roompage/"+ res.data.room._id)
    }catch (error) {
         console.log("room error:", error)
         alert("Invalid or expired room link")

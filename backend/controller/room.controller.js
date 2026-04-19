@@ -113,7 +113,8 @@ export const joinRoomController = async (req, res) => {
         await room.save();
         return res.status(200).json({
             message: "Joined room successfully",
-            participants: room.participants
+            participants: room.participants,
+            room
         });
 
     } catch (error) {

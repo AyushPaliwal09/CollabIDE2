@@ -29,7 +29,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
   )
       console.log(res.data)
       setRefreshRooms(prev => prev + 1);
-      navigate("/room/roompage/")
+      navigate("/room/roompage/"+ res.data.data._id)
     } catch (error) {
       console.log("error in createroom", error.message);
       

@@ -48,10 +48,13 @@ app.use(cors({
 app.use("/api/auth", userRouter)
 app.use("/room", roomRouter)
 
-server.listen(PORT, () => {
-  console.log(`Server is running on PORT: ${PORT}`);
-});
+// server.listen(PORT, () => {
+//   console.log(`Server is running on PORT: ${PORT}`);
+// });
 
+app.listen(PORT, () => {
+  console.log(`Server is running on PORT: ${PORT}`);
+})
 
 
 

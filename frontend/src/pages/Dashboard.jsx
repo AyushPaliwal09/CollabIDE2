@@ -10,6 +10,7 @@ import CreateRoomModal  from "../components/CreateRoomModal.jsx";
 import { ROOMS } from "../data/Room.js";
 import DashboardNavbar from "../components/DashboardNavbar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
@@ -20,7 +21,7 @@ export default function Dashboard() {
   const {user} = useAuth();
   const [rooms, setRooms] = useState([]);
   const [refreshRooms, setRefreshRooms] = useState(0);
-
+  const navigate = useNavigate()
   // close modal on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") closeModal(); };
@@ -38,7 +39,11 @@ export default function Dashboard() {
     }
     fetchRooms();
   },[refreshRooms]);
- 
+  const handleJoinRoom = (roomId) => {
+    navigate(`/room/roompage/${roomId}`);
+    console.log(roomId);
+    
+  };
   return (
     <>
       {/* ── Fixed navbar ── */}
@@ -98,7 +103,7 @@ export default function Dashboard() {
                 <RoomCard room={room} delay={i}
                   key={room._id}
                   setRefreshRooms={setRefreshRooms}
-                  // roomName={room.roomName}
+                  onClick={() => handleJoinRoom(room._id)}
                          />
               ))}
             </div>

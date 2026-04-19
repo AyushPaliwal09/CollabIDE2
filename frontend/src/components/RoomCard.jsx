@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { UsersIcon } from "./ui/Icons.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const RoomCard = ({ room, delay, setRefreshRooms }) =>{
+const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
   // const now = new Date();
   // const lastActiveDate = new Date(room.lastActive);
   // const diffMinutes = Math.floor((now - lastActiveDate) / 60000);
@@ -20,6 +21,7 @@ const RoomCard = ({ room, delay, setRefreshRooms }) =>{
   // room.lastActive = lastActiveText;
   const {user} = useAuth();
   const deleteRoom = room.admin === user._id;
+   const { roomId } = useParams();
   const handleDeleteRoom = async () => {
     try {
       await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
@@ -33,7 +35,7 @@ const RoomCard = ({ room, delay, setRefreshRooms }) =>{
   };
   return (
 
-  <div className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
+  <div onClick={onClick} className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
     {/* Top row */}
     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -105,14 +107,4 @@ const RoomCard = ({ room, delay, setRefreshRooms }) =>{
 }
 export default RoomCard;
 
-// import React from 'react'
 
-// const RoomCard = ({roomNameq}) => {
-//   return (
-//     <div>
-//       <h3 className='text-white'>{roomName}</h3>
-//     </div>
-//   )
-// }
-
-// export default RoomCard
