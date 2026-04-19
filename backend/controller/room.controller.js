@@ -18,12 +18,8 @@ export const fetchRoomsController = async (req, res) => {
     try {
         const { userId } = req
         const user = await User.findById(userId).populate("rooms")
-        console.log(userId);
-
         const rooms = user.rooms
         res.status(200).json(rooms)
-        console.log(rooms);
-
     } catch (error) {
         res.status(500).json({ message: "Error in fetchRoomsController", error: error.message })
         console.log("Error in fetchRoomsController", error.message);
@@ -70,16 +66,11 @@ export const deleteRoomController = async (req, res) => {
             return res.json({ message: "Room not found" })
         }
         const admin = room.admin
-        console.log(admin);
-
-
         if (userId == admin) {
             await Room.findByIdAndDelete({ _id: id })
             return res.json({ message: "Room deleted" })
         }
         res.json({ message: "You are not admin" })
-
-
     } catch (error) {
         res.status(500).json({ message: "Error in deleteRoomController", error: error.message })
         console.log("Error in deleteRoomController", error.message);
@@ -94,9 +85,7 @@ export const joinRoomController = async (req, res) => {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-
         const room = await Room.findOne({ _id: id });
-
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
         }
