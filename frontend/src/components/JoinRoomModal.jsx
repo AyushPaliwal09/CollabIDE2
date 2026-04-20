@@ -16,7 +16,7 @@ const JoinRoomModal = ({onClose, setRefreshRooms}) => {
     console.log(res);
 
     setRefreshRooms(prev => prev + 1);
-     navigate("/room/roompage/"+ res.data.room._id)
+    navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
    }catch (error) {
         console.log("room error:", error)
         alert("Invalid or expired room link")
@@ -47,6 +47,7 @@ return (
           type="text"
           name="join"
           value={join}
+          onKeyDown={(e)=> { if(e.key === "Enter") handleJoin(); }}
           onChange={(e) => setJoin(e.target.value)}
           placeholder="collabide.dev/join/abc-xyz-123"
           autoFocus

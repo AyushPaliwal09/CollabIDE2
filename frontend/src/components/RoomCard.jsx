@@ -21,6 +21,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
   // room.lastActive = lastActiveText;
   const {user} = useAuth();
   const deleteRoom = room.admin === user._id;
+  const isLive = room.activeUser.length >= 1;
    const { roomId } = useParams();
   const handleDeleteRoom = async () => {
     try {
@@ -59,7 +60,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
         </div>
       </div>
       {/* Live badge */}
-      {room.activeUser.length>=1 && (
+      {isLive && (
         <span className="db-tag live" style={{ flexShrink: 0 }}>
           <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
           live
@@ -95,11 +96,16 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, transition: "background 0.18s, transform 0.15s",
           }}
-          onClick={handleDeleteRoom}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteRoom();
+          }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
         >🗑</button>}
-        <button className="db-card-btn">{room.live ? "Open" : "Resume"}</button>
+        <button className="db-card-btn" onClick={onClick}>
+          {isLive ? "Open" : "Resume"}
+        </button>
       </div>
     </div>
   </div>

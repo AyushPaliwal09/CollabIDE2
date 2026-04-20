@@ -9,6 +9,7 @@ import Editor from "@monaco-editor/react";
 import { DEFAULT_CODE, TABS } from "../data/MockData.js";
 import { useState, useEffect, useRef, useCallback} from "react";
 import SettingsModal from "../components/SettingModal.jsx";
+import { useLocation } from "react-router-dom";
 
 
 
@@ -131,6 +132,10 @@ export default function Workspace() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  const { state } = useLocation();
+  const room = state?.roomData;
+  console.log("Room data:", state?.roomData);
+
   return (
     <>
 
@@ -142,6 +147,7 @@ export default function Workspace() {
           onToggleSidebar={() => setSidebarOpen(v => !v)}
           chatOpen={true}
           onToggleChat={() => { }}
+          room={room}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
@@ -184,7 +190,7 @@ export default function Workspace() {
                 <Editor
                   height="100%"
                   language={currentLang}
-                  defaultValue={DEFAULT_CODE}
+                  defaultValue={room.code}
                   theme="vs-dark"
                   options={{
                     fontSize: 13,

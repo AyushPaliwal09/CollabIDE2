@@ -39,8 +39,22 @@ export default function Dashboard() {
     }
     fetchRooms();
   },[refreshRooms]);
-  const handleJoinRoom = (roomId) => {
-    navigate(`/room/roompage/${roomId}`);
+  const handleJoinRoom = async (roomId) =>  {
+    try{
+      var room = rooms.find(r => r._id === roomId);
+      if(!room){
+        alert("Room not found");
+        return;
+      }
+      const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
+      console.log(res);
+      navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
+    } catch (error) {
+      console.error("Error finding room:", error);
+      alert("Error occurred while trying to join the room");
+    }
+
+    // navigate(`/room/roompage/${roomId}`, {state: {roomData: room}});
     console.log(roomId);
     
   };
@@ -87,7 +101,7 @@ export default function Dashboard() {
             onJoinRoom={() => openModal("join")}
           />
  
-          <StatsBar />
+          <StatsBar totalRooms={rooms.length} nowLive={rooms.filter(r => r.ActiveUsers && r.ActiveUsers.length > 0).length} />
  
           {/* ── Rooms grid or empty state ── */}
           {hasRooms ? (

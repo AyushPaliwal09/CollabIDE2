@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CloseIcon } from "./ui/Icons.jsx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -8,6 +8,13 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
   const [interviewMode, setInterviewMode] = useState(false);
   const [roomData, setRoomData] = useState({roomName:"", description:""})
   const navigate = useNavigate()
+  const descriptionField = useRef();
+  const handleFirstEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // form submit rokega
+      descriptionField.current.focus(); // next input pe focus
+    }
+  };
   const handleChange = (e)=>{
     setRoomData({...roomData, [e.target.name]:e.target.value})
   }
@@ -27,9 +34,9 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
       }
     }
   )
-      console.log(res.data)
+      console.log("room card room data: ", res.data.data);
       setRefreshRooms(prev => prev + 1);
-      navigate("/room/roompage/"+ res.data.data._id)
+      navigate("/room/roompage/"+ res.data.data._id, {state: {roomData: res.data.data}});
     } catch (error) {
       console.log("error in createroom", error.message);
       
@@ -63,6 +70,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
           name="roomName"
           value={roomData.roomName}
           onChange={handleChange}
+          onKeyDown={handleFirstEnter}
           className="db-modal-input" type="text" placeholder="e.g. auth-refactor" />
         </div>
 
@@ -72,7 +80,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
           >
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>
-          <textarea name="description" onKeyDown={(e)=>{if (e.key === "Enter") { e.preventDefault(); handleSubmit(); }}}   value={roomData.description} onChange={handleChange}
+          <textarea name="description" ref={descriptionField} onKeyDown={(e)=>{if (e.key === "Enter") { e.preventDefault(); handleSubmit(); }}}   value={roomData.description} onChange={handleChange}
           className="db-modal-input" rows={3} placeholder="Describe what you're building…" />
         </div>
 

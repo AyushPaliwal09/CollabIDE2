@@ -1,11 +1,23 @@
 import { USERS } from "../data/MockData.js";
 import { ChevronLeft, ChevronRight, LinkIcon, PlayIcon, PowerIcon } from "./ui/Icons.jsx";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const RoomHeader = ({ sidebarOpen, onToggleSidebar, chatOpen, onToggleChat }) => {
+const RoomHeader = ({ sidebarOpen, onToggleSidebar, chatOpen, onToggleChat, room }) => {
   const navigate = useNavigate()
   const handleLeave = ()=>{
+    const res= axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
     navigate("/dashboard")
+  }
+  const handleInvite = ()=>{
+  try {
+      const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl);
+    alert("Room URL copied to clipboard!");
+  } catch (error) {
+    console.error("Failed to copy URL:", error);
+    alert("Failed to copy URL");
+  }
   }
 return (
   <header className="ws-room-header">
@@ -30,7 +42,7 @@ return (
     {/* Room name + tag */}
     <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
       <span className="font-display font-semibold" style={{ fontSize: "0.82rem", color: "#E5E7EB", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
-        auth-refactor
+        {room.roomName}
       </span>
       <span style={{
         fontSize: "9px", padding: "2px 7px", borderRadius: 999,
@@ -59,7 +71,7 @@ return (
         </div>
       ))}
       <span style={{ fontSize: 10, color: "#4B5563", marginLeft: 6, whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>
-        {USERS.length} online
+        {room.activeUser.length} online
       </span>
     </div>
  
@@ -70,7 +82,7 @@ return (
       <button className="ws-run-btn">
         <PlayIcon /> Run
       </button>
-      <button className="ws-invite-btn">
+      <button className="ws-invite-btn" onClick={handleInvite}>
         <LinkIcon /> Invite
       </button>
       <button className="ws-leave-btn" onClick={handleLeave}>
