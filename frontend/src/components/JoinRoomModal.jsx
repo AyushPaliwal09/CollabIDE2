@@ -4,21 +4,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 
-const JoinRoomModal = ({onClose, setRefreshRooms}) => {
+const JoinRoomModal = ({onClose}) => {
   const [join, setJoin] = useState("")
    const { roomId } = useParams()
   const navigate = useNavigate()
   const handleJoin = async ()=>{
    try {
-   // const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
-   console.log("attempting to join room with id:", join.split("/").slice(-1)[0]);
-   const res = await axios.post(`http://localhost:5000/room/join-room/${join.split("/").slice(-1)[0]}`)
-    console.log(res);
-
-    setRefreshRooms(prev => prev + 1);
-     navigate("/room/roompage/"+ res.data.room._id)
+    const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
+    console.log(res.data);
+    
+     navigate("/login")
    }catch (error) {
-        console.log("room error:", error)
+        console.log(error)
         alert("Invalid or expired room link")
       }
   }
@@ -45,9 +42,6 @@ return (
         <input
           className="db-modal-input"
           type="text"
-          name="join"
-          value={join}
-          onChange={(e) => setJoin(e.target.value)}
           placeholder="collabide.dev/join/abc-xyz-123"
           autoFocus
         />

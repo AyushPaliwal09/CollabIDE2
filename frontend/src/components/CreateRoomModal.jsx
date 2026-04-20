@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
+const CreateRoomModal = ({ onClose }) => {
   const [interviewMode, setInterviewMode] = useState(false);
   const [roomData, setRoomData] = useState({roomName:"", description:""})
   const navigate = useNavigate()
@@ -12,14 +12,13 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
     setRoomData({...roomData, [e.target.name]:e.target.value})
   }
   const handleSubmit=async()=>{
-    if(!roomData.description || !roomData.roomName){
-      return alert("please fill all the fields")
-    }
     try {
+        if(!roomData.description|| !roomData.roomName){
+      return alert("Please fill all the filed")
+    }
       const res = await axios.post("http://localhost:5000/room/create-room",{
        roomName: roomData.roomName,
        description: roomData.description,
-        interviewMode: interviewMode
       },
       {
       headers: {
@@ -28,8 +27,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
     }
   )
       console.log(res.data)
-      setRefreshRooms(prev => prev + 1);
-      navigate("/room/roompage/"+ res.data.data._id)
+      navigate("/room/roompage")
     } catch (error) {
       console.log("error in createroom", error.message);
       
@@ -72,7 +70,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
           >
             Description <span style={{ color: "#374151" }}>(optional)</span>
           </label>
-          <textarea name="description" onKeyDown={(e)=>{if (e.key === "Enter") { e.preventDefault(); handleSubmit(); }}}   value={roomData.description} onChange={handleChange}
+          <textarea name="description"   value={roomData.description} onChange={handleChange}
           className="db-modal-input" rows={3} placeholder="Describe what you're building…" />
         </div>
 

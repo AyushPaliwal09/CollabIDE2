@@ -1,42 +1,26 @@
 import axios from "axios";
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect,  } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    //const [token, setToken] = useState(null);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
-    const [isLogin, setIsLogin] = useState(null)
+    const [isLogin, setIsLogin] = useState(false)
     const navigate = useNavigate();
 
     useEffect(() => {
-  async function  checkAuth()  {
-         if (token) {
-            try{
+        if(token){
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            const res = await axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true })
-            
-                setUser(res.data);
-                setIsLogin(true);
-      
+            setIsLogin(true);  
         }
-        catch(error){
-            delete axios.defaults.headers.common["Authorization"]
-            localStorage.removeItem("token");
-            setUser(null);
-            setIsLogin(false);
-            navigate("/auth");
-            console.log("Error fetching user data:", error.response?.data || error.message);
-        }
-    }
-        else {
+        else{
             delete axios.defaults.headers.common["Authorization"];
             setIsLogin(false);
-            // navigate("/")
+            navigate("/")
         }
-   }
-    checkAuth();
     }, [token]);
 
     const signup = async (username, email, password) => {
@@ -52,8 +36,7 @@ export const AuthProvider = ({ children }) => {
             setToken(res.data.token);
             localStorage.setItem("token", res.data.token);
             axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
-            if (res.status === 200) {
-                setIsLogin(true);
+             if (res.status === 200) {
                 return { success: true, data: res.data }
             }
 
@@ -67,7 +50,7 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post("http://localhost:5000/api/auth/login", {
                 email,
                 password
-            }, { withCredentials: true });
+            }, {withCredentials:true});
             console.log(res)
             console.log(res.data.user);
 
@@ -76,7 +59,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("token", res.data.token);
             axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
             if (res.status === 200) {
-                setIsLogin(true);
                 return { success: true, data: res.data }
             }
         } catch (error) {
@@ -85,64 +67,14 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const firebaseLogin = async (username, email, uid) => {
-        try {
-            const res = await axios.post("http://localhost:5000/api/auth/firebase-auth", {
-                username,
-                email,
-                uid
-            });
-            console.log(res);
-
-            setUser(res.data.user);
-            setToken(res.data.token);
-            localStorage.setItem("token", res.data.token);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
-            if (res.status === 200) {
-                setIsLogin(true);
-                return { success: true, data: res.data }
-            }
-        } catch (error) {
-            console.log("Google login error:", error.response?.data || error.message);
-            return { success: false, message: error.response?.data || error.message }
-        }
-    };
-
-    // const githubLogin = async (username, email, uid) => {
-    //     try {
-    //         const res = await axios.post("http://localhost:5000/api/auth/github-auth", {
-    //             username,
-    //             email,
-    //             uid
-    //         });
-    //         console.log(res);
-
-    //         setUser(res.data.user);
-    //         setToken(res.data.token);
-    //         localStorage.setItem("token", res.data.token);
-    //         axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
-    //         if (res.status === 200) {
-    //             setIsLogin(true);
-    //             return { success: true, data: res.data }
-    //         }
-    //     } catch (error) {
-    //         console.log("GitHub login error:", error.response?.data || error.message);
-    //         return { success: false, message: error.response?.data || error.message }
-    //     }
-    // };
-
-
     const logout = () => {
         setUser(null);
         setToken(null);
         localStorage.removeItem("token");
-        delete axios.defaults.headers.common["Authorization"];
-        setIsLogin(false);
-        navigate("/auth")
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLogin, token, login, logout, signup, firebaseLogin }}>
+        <AuthContext.Provider value={{ user, token, login, logout, signup }}>
             {children}
         </AuthContext.Provider>
     );

@@ -2,11 +2,9 @@ import { useState } from "react";
 import Logo from "./ui/Logo.jsx";
 import {SearchIcon, PlusIcon, LinkIcon, SettingsIcon} from "./ui/Icons.jsx";
 import ProfileDropdown from "./ProfileDropdown.jsx";
-import { useNavigate } from "react-router-dom";
 const DashboardNavbar = ({ onCreateRoom, onJoinRoom, onSettings }) => {
   const [searchVal, setSearchVal] = useState("");
   const [showProfile, setShowProfile] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <>

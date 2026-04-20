@@ -1,13 +1,7 @@
 import { USERS } from "../data/MockData.js";
 import { ChevronLeft, ChevronRight, LinkIcon, PlayIcon, PowerIcon } from "./ui/Icons.jsx";
-import { useNavigate } from "react-router-dom";
 
-const RoomHeader = ({ sidebarOpen, onToggleSidebar, chatOpen, onToggleChat }) => {
-  const navigate = useNavigate()
-  const handleLeave = ()=>{
-    navigate("/dashboard")
-  }
-return (
+const RoomHeader = ({ sidebarOpen, onToggleSidebar, chatOpen, onToggleChat }) => (
   <header className="ws-room-header">
     {/* Logo + toggle */}
     <button className="ws-icon-btn" onClick={onToggleSidebar} title="Toggle sidebar">
@@ -73,12 +67,11 @@ return (
       <button className="ws-invite-btn">
         <LinkIcon /> Invite
       </button>
-      <button className="ws-leave-btn" onClick={handleLeave}>
+      <button className="ws-leave-btn">
         <PowerIcon /> Leave
       </button>
     </div>
   </header>
-)
-}
+);
  
 export default RoomHeader;

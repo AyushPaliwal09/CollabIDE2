@@ -1,41 +1,7 @@
-import { useEffect, useState } from "react";
 import { UsersIcon } from "./ui/Icons.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
-import axios from "axios";
-import { useParams } from "react-router-dom";
 
-const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
-  // const now = new Date();
-  // const lastActiveDate = new Date(room.lastActive);
-  // const diffMinutes = Math.floor((now - lastActiveDate) / 60000);
-  // let lastActiveText = "";
-  // if (diffMinutes < 1) {
-  //   lastActiveText = "Just now";
-  // } else if (diffMinutes < 60) {
-  //   lastActiveText = `${diffMinutes} minutes ago`;
-  // } else if (diffMinutes < 1440) {
-  //   lastActiveText = `${Math.floor(diffMinutes / 60)} hours ago`;
-  // } else {
-  //   lastActiveText = `${Math.floor(diffMinutes / 1440)} days ago`;
-  // }
-  // room.lastActive = lastActiveText;
-  const {user} = useAuth();
-  const deleteRoom = room.admin === user._id;
-   const { roomId } = useParams();
-  const handleDeleteRoom = async () => {
-    try {
-      await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
-      setRefreshRooms(prev => prev + 1);
-      // alert("Room deleted successfully");
-    } catch (error) {
-      console.error("Error deleting room:", error);
-      alert("Failed to delete room");
-
-    }
-  };
-  return (
-
-  <div onClick={onClick} className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
+const RoomCard = ({ room, delay }) => (
+  <div className={`db-card fade-up delay-${delay}`} style={{ position: "relative", zIndex: 1 }}>
     {/* Top row */}
     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -50,16 +16,16 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
         </div>
         <div>
           <div className="font-display font-semibold" style={{ fontSize: "0.88rem", color: "#F9FAFB", lineHeight: 1.2 }}>
-            {room.roomName}
+            {room.name}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 3 }}>
             <UsersIcon />
-            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.participants.length+1} members</span>
+            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.members} members</span>
           </div>
         </div>
       </div>
       {/* Live badge */}
-      {room.activeUser.length>=1 && (
+      {room.live && (
         <span className="db-tag live" style={{ flexShrink: 0 }}>
           <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
           live
@@ -74,7 +40,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
       display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
       overflow: "hidden",
     }}>
-      {room.description || "No description provided."}
+      {room.desc}
     </p>
 
     {/* Footer */}
@@ -85,8 +51,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {/* Delete button */}
-        {deleteRoom &&
-        <button 
+        <button
           onClick={e => e.stopPropagation()}
           style={{
             width: 26, height: 26, borderRadius: 7, border: "none",
@@ -95,16 +60,13 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, transition: "background 0.18s, transform 0.15s",
           }}
-          onClick={handleDeleteRoom}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
-        >🗑</button>}
+        >🗑</button>
         <button className="db-card-btn">{room.live ? "Open" : "Resume"}</button>
       </div>
     </div>
   </div>
 );
-}
+
 export default RoomCard;
-
-

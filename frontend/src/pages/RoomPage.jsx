@@ -7,7 +7,7 @@ import { FileCodeIcon, FilesIcon } from "../components/ui/Icons.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import Editor from "@monaco-editor/react";
 import { DEFAULT_CODE, TABS } from "../data/MockData.js";
-import { useState, useEffect, useRef, useCallback} from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import SettingsModal from "../components/SettingModal.jsx";
 
 
@@ -29,7 +29,6 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
-
 
   // ── Monaco language per file tab ──────────────────────────────────────────
   const currentLang = tabs.find(t => t.id === activeTab)?.lang ?? "javascript";
