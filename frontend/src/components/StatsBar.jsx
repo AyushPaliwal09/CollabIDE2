@@ -1,10 +1,10 @@
-const StatsBar = () => (
+const StatsBar = ({ totalRooms, nowLive }) => (
   <div className="fade-up delay-1" style={{
     display: "flex", gap: 12, marginBottom: 28, flexWrap: "wrap",
   }}>
     {[
-      { label: "Total rooms", val: "6", color: "#8B5CF6" },
-      { label: "Live now",    val: "3", color: "#22C55E" },
+      { label: "Total rooms", val: totalRooms, color: "#8B5CF6" },
+      { label: "Live now",    val: nowLive, color: "#22C55E" },
       { label: "Members",     val: "17", color: "#EC4899" },
     ].map((s, i) => (
       <div key={i} style={{

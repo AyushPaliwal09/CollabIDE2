@@ -48,7 +48,7 @@ export const createRoomController = async (req, res) => {
             return res.status(400).json({ message: "room already there" });
         }
         user.rooms.push(roomObjectId)
-
+        newRoom.activeUser.push(admin);
         await user.save()
         await newRoom.save()
         return res.status(200).json({ message: "Room created ", data: newRoom })
@@ -140,5 +140,41 @@ export const roomPageController = async (req, res) => {
             message: "Error in roomPageController",
             error: error.message
         });
+    }
+}
+
+export const leaveRoomController = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { userId } = req;
+        const room = await Room.findById({ _id: id })
+        if (!room) {
+            return res.status(404).json({ message: "Room not found" })
+        }   
+        room.activeUser = room.activeUser.filter(p => p.toString() !== userId)
+        await room.save();
+    } catch (error) {   
+        console.log("Error in leaveRoomController", error.message);
+        return res.status(500).json({
+            message: "Error in leaveRoomController",
+            error: error.message
+        });
+    }
+}
+
+export const rejoinRoomController = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { userId } = req;
+        const room = await Room.findById({ _id: id })
+        if (!room) {
+            return res.status(404).json({ message: "Room not found" })
+        }
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+        room.activeUser.push(userObjectId);
+        await room.save();
+    } catch (error) {
+        console.log("Error in rejoinRoomController", error.message);
+        return res.status(500).json({ message: "Error in rejoinRoomController", error: error.message });
     }
 }

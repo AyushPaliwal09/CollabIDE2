@@ -22,7 +22,36 @@ export default function Dashboard() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
- 
+
+  useEffect(() => {
+    async function fetchRooms() {
+      console.log("fetching rooms for user:", user._id);
+      const res = await axios.post(`http://localhost:5000/room/fetch-rooms/${user._id}`);
+      setRooms(res.data);
+      console.log("these are rooms",res.data);
+      setHasRooms(res.data.length > 0);
+    }
+    fetchRooms();
+  },[refreshRooms]);
+  const handleJoinRoom = async (roomId) =>  {
+    try{
+      var room = rooms.find(r => r._id === roomId);
+      if(!room){
+        alert("Room not found");
+        return;
+      }
+      const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
+      console.log(res);
+      navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
+    } catch (error) {
+      console.error("Error finding room:", error);
+      alert("Error occurred while trying to join the room");
+    }
+
+    // navigate(`/room/roompage/${roomId}`, {state: {roomData: room}});
+    console.log(roomId);
+    
+  };
   return (
     <>
      
@@ -68,7 +97,7 @@ export default function Dashboard() {
             onJoinRoom={() => openModal("join")}
           />
  
-          <StatsBar />
+          <StatsBar totalRooms={rooms.length} nowLive={rooms.filter(r => r.ActiveUsers && r.ActiveUsers.length > 0).length} />
  
           {/* ── Rooms grid or empty state ── */}
           {hasRooms ? (

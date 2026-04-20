@@ -23,8 +23,16 @@ const roomSchema = mongoose.Schema({
     interviewBtn: {
         type: Boolean,
         default: false
-    }
-    
+    },
+    code: {
+    type: String,
+    default: "// Start coding here..."
+  },
+
+  language: {
+    type: String,
+    default: "javascript"
+  }
 }, { timestamps: true })
 
 
