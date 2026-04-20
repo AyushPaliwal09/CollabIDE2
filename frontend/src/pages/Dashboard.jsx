@@ -46,7 +46,7 @@ export default function Dashboard() {
         alert("Room not found");
         return;
       }
-      const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
+      const res = await axios.post(`http://localhost:5000/room/rejoin-room/${roomId}`)
       console.log(res);
       navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
     } catch (error) {

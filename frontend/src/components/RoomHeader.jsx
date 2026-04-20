@@ -48,7 +48,7 @@ return (
         fontSize: "9px", padding: "2px 7px", borderRadius: 999,
         background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.22)",
         color: "#a78bfa", fontFamily: "JetBrains Mono, monospace", whiteSpace: "nowrap",
-      }}>TypeScript</span>
+      }}>{room.language}</span>
       {/* Live dot */}
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <div className="pulse-dot" style={{
