@@ -47,7 +47,7 @@ export default function Dashboard() {
         return;
       }
       const res = await axios.post(`http://localhost:5000/room/rejoin-room/${roomId}`)
-      console.log(res);
+      console.log("res:", res);
       navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
     } catch (error) {
       console.error("Error finding room:", error);

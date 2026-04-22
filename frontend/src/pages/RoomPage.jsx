@@ -1,3 +1,6 @@
+import axios from "axios";
+import { useAuth } from "../context/AuthContext.jsx";
+import { io } from "socket.io-client";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -30,6 +33,39 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const socketRef = useRef(null);
+  const { user } = useAuth();
+  const { state } = useLocation();
+  const [room, setRoom] = useState(state?.roomData);
+  console.log("Initial room data from location state:", room);
+  console.log("User data from auth context:", user);
+    const socket = socketRef.current;
+
+  useEffect(() => {
+    async function fetchRoom() {
+      const res = await axios.post(`http://localhost:5000/room/room-page/${state?.roomData?._id}`, { withCredentials: true });
+      console.log("Fetched room result:", res);
+      setRoom(res.data);
+    }
+    fetchRoom();
+    if(!socketRef.current) {
+      socketRef.current = io("http://localhost:5000", {
+        withCredentials: true,
+        transports : ['websocket'],
+        forceNew: true,
+      });
+    }
+    const socket = socketRef.current;
+
+    socket.on("connect", () => {
+      console.log("Connected to socket server with ID:", socket.id);
+      socket.on("connect_error", (err) => {
+        console.error("Connection error:", err);
+      });
+      socket.emit("join-room", state?.roomData?._id, user);
+    });
+
+  }, [room?._id, user]);
 
 
   // ── Monaco language per file tab ──────────────────────────────────────────
@@ -132,9 +168,8 @@ export default function Workspace() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const { state } = useLocation();
-  const room = state?.roomData;
-  console.log("Room data:", state?.roomData);
+  
+  console.log("Room data:", room);
 
  
   return (
@@ -149,6 +184,7 @@ export default function Workspace() {
           chatOpen={true}
           onToggleChat={() => { }}
           room={room}
+          socket = {socket}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}

@@ -61,6 +61,9 @@ export const deleteRoomController = async (req, res) => {
     try {
         const { id } = req.params
         const { userId } = req
+        const user = await User.findById({userId})
+        console.log(user);
+        
         const room = await Room.findOne({ _id: id });
         if (!room) {
             return res.json({ message: "Room not found" })
@@ -68,15 +71,18 @@ export const deleteRoomController = async (req, res) => {
         const admin = room.admin
         if (userId == admin) {
             await Room.findByIdAndDelete({ _id: id })
+            if (user.rooms.includes(_id)) {
+                user.rooms = user.rooms.filter((p) => p && p.toString() !== _id)
+            }
             return res.json({ message: "Room deleted" })
         }
+
         res.json({ message: "You are not admin" })
     } catch (error) {
         res.status(500).json({ message: "Error in deleteRoomController", error: error.message })
         console.log("Error in deleteRoomController", error.message);
     }
 }
-
 export const joinRoomController = async (req, res) => {
     try {
         const { id } = req.params;
@@ -151,11 +157,14 @@ export const leaveRoomController = async (req, res) => {
         console.log("Leaving room with id:", id, "for user:", userId);
         if (!room) {
             return res.status(404).json({ message: "Room not found" })
-        }   
-        room.activeUser = room.activeUser.filter(p => p.toString() !== userId)
+        }
+        if (room.activeUser.includes(userId)) {
+            room.activeUser = room.activeUser.filter((p) => p && p.toString() !== userId)
+        }
         console.log("Updated active users after leaving:", room.activeUser);
+        res.status(200).json({ message: "Left room successfully", room })
         await room.save();
-    } catch (error) {   
+    } catch (error) {
         console.log("Error in leaveRoomController", error.message);
         return res.status(500).json({
             message: "Error in leaveRoomController",
@@ -178,6 +187,7 @@ export const rejoinRoomController = async (req, res) => {
             return res.status(400).json({ message: "User already in room" })
             console.log("User already active in room with id:", id);
         }
+        console.log("Current active users before rejoining:", room.activeUser);
         room.activeUser.push(userId);
         await room.save();
         res.status(200).json({ message: "Rejoined room successfully", room })
@@ -195,10 +205,10 @@ export const updateRoomCodeController = async (req, res) => {
         const room = await Room.findByIdAndUpdate(id, { code }, { new: true });
         if (!room) {
             return res.status(404).json({ message: "Room not found" });
-        }   
+        }
         res.status(200).json({ message: "Room code saved", room });
     } catch (error) {
         console.log("Error in updateRoomCodeController", error.message);
         return res.status(500).json({ message: "Error in updateRoomCodeController", error: error.message });
-    }   
+    }
 }
