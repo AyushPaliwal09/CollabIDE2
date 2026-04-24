@@ -58,6 +58,7 @@ app.use(cors({
 }));
 app.use("/api/auth", userRouter)
 app.use("/room", roomRouter)
+app.get("/",(req,res)=> res.send("Hello there"))
 
 
 server.listen(PORT, () => {
