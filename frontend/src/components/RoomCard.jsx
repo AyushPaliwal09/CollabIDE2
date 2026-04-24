@@ -23,6 +23,8 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
     try {
       await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
       setRefreshRooms(prev => prev + 1);
+      console.log(room);
+      
       // alert("Room deleted successfully");
     } catch (error) {
       console.error("Error deleting room:", error);

@@ -61,9 +61,10 @@ export const deleteRoomController = async (req, res) => {
     try {
         const { id } = req.params
         const { userId } = req
-        const user = await User.findById({userId})
-        console.log(user);
-        
+        // const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        const user = await User.findById({ _id: userId })
+        console.log(user)
         const room = await Room.findOne({ _id: id });
         if (!room) {
             return res.json({ message: "Room not found" })
@@ -71,8 +72,10 @@ export const deleteRoomController = async (req, res) => {
         const admin = room.admin
         if (userId == admin) {
             await Room.findByIdAndDelete({ _id: id })
-            if (user.rooms.includes(_id)) {
-                user.rooms = user.rooms.filter((p) => p && p.toString() !== _id)
+            if (user.rooms.includes(id)) {
+                user.rooms = user.rooms.filter((p) => p && p.toString() !== id)
+                console.log("room deleted");
+                console.log(user);
             }
             return res.json({ message: "Room deleted" })
         }

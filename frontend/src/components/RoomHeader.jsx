@@ -5,29 +5,10 @@ import axios from "axios";
 import { useEffect } from "react";
 import {useAuth} from "../context/AuthContext.jsx"
 
-const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room }) => {
+const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room, handleLeave }) => {
   const navigate = useNavigate()
 const { user } = useAuth()
 
-  const handleLeave = async () => {
-    const res = await axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
-    socket.emit("leave-room", { roomId: room._id, userID: user.userId });
-    console.log("Leave room");
-
-    navigate("/dashboard")
-  }
-  useEffect(() => {
-    // const handleLeave = ()=>{
-    //   const res= axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
-    //   navigate("/dashboard")
-    // }
-
-    window.addEventListener("beforeunload", handleLeave);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleLeave);
-    };
-  }, []);
   const handleInvite = () => {
     try {
       const currentUrl = window.location.href;
@@ -62,13 +43,13 @@ const { user } = useAuth()
       {/* Room name + tag */}
       <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
         <span className="font-display font-semibold" style={{ fontSize: "0.82rem", color: "#E5E7EB", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
-          {room.roomName}
+          {room?.roomName}
         </span>
         <span style={{
           fontSize: "9px", padding: "2px 7px", borderRadius: 999,
           background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.22)",
           color: "#a78bfa", fontFamily: "JetBrains Mono, monospace", whiteSpace: "nowrap",
-        }}>{room.language}</span>
+        }}>{room?.language}</span>
 
         {/* Live dot */}
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -92,7 +73,7 @@ const { user } = useAuth()
           </div>
         ))}
         <span style={{ fontSize: 10, color: "#4B5563", marginLeft: 6, whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>
-          {room.activeUser.length} online
+          {room?.activeUser?.length} online
         </span>
       </div>
 
