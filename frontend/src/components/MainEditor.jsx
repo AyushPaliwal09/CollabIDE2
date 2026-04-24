@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import React from 'react'
 
 const MainEditor = ({ room , currentLang }) => {
-    const [code, setCode] = useState(room.code);
+    const [code, setCode] = useState(room?.code);
     useEffect(() => {
         if (!room._id) return;
         const timer = setTimeout(() => {
