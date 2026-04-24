@@ -98,7 +98,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
           onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
         >🗑</button>
-        <button className="db-card-btn" onClick={onClick}>
+        <button className="db-card-btn" >
           {isLive ? "Open" : "Resume"}
         </button>
       </div>

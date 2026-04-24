@@ -37,7 +37,7 @@ const CreateRoomModal = ({ onClose }) => {
       setRefreshRooms(prev => prev + 1);
       navigate("/room/roompage/"+ res.data.data._id, {state: {roomData: res.data.data}});
     } catch (error) {
-      console.log("error in createroom", error.message);
+      console.log("error in createRoom", error.message);
       
     }
   }

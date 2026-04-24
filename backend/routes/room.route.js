@@ -7,7 +7,8 @@ import {
     joinRoomController,
     roomPageController,
     leaveRoomController,
-    rejoinRoomController
+    rejoinRoomController,
+    updateRoomCodeController
 } from "../controller/room.controller.js"
 import { protect } from "../middleware/middleware.js"
 
@@ -21,6 +22,7 @@ router.post("/join-room/:id",protect, joinRoomController)
 router.post("/room-page/:id",protect, roomPageController)
 router.post("/leave-room/:id",protect, leaveRoomController)
 router.post("/rejoin-room/:id",protect, rejoinRoomController)
+router.put("/update-room-code/:id",protect, updateRoomCodeController)
 
 
 

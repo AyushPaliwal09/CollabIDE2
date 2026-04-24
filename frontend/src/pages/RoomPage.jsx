@@ -1,3 +1,6 @@
+import axios from "axios";
+import { useAuth } from "../context/AuthContext.jsx";
+import { io } from "socket.io-client";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -5,11 +8,11 @@ import TabsBar from "../components/TabsBar.jsx";
 import Terminal from "../components/Terminal.jsx";
 import { FileCodeIcon, FilesIcon } from "../components/ui/Icons.jsx";
 import Sidebar from "../components/Sidebar.jsx";
-import Editor from "@monaco-editor/react";
 import { DEFAULT_CODE, TABS } from "../data/MockData.js";
 import { useState, useEffect, useRef, useCallback } from "react";
 import SettingsModal from "../components/SettingModal.jsx";
 import { useLocation } from "react-router-dom";
+import MainEditor from "../components/MainEditor.jsx";
 
 
 
@@ -30,6 +33,39 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const socketRef = useRef(null);
+  const { user } = useAuth();
+  const { state } = useLocation();
+  const [room, setRoom] = useState(state?.roomData);
+  console.log("Initial room data from location state:", room);
+  console.log("User data from auth context:", user);
+    const socket = socketRef.current;
+
+  useEffect(() => {
+    async function fetchRoom() {
+      const res = await axios.post(`http://localhost:5000/room/room-page/${state?.roomData?._id}`, { withCredentials: true });
+      console.log("Fetched room result:", res);
+      setRoom(res.data);
+    }
+    fetchRoom();
+    if(!socketRef.current) {
+      socketRef.current = io("http://localhost:5000", {
+        withCredentials: true,
+        transports : ['websocket'],
+        forceNew: true,
+      });
+    }
+    const socket = socketRef.current;
+
+    socket.on("connect", () => {
+      console.log("Connected to socket server with ID:", socket.id);
+      socket.on("connect_error", (err) => {
+        console.error("Connection error:", err);
+      });
+      socket.emit("join-room", state?.roomData?._id, user);
+    });
+
+  }, [room?._id, user]);
 
   // ── Monaco language per file tab ──────────────────────────────────────────
   const currentLang = tabs.find(t => t.id === activeTab)?.lang ?? "javascript";
@@ -131,10 +167,10 @@ export default function Workspace() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const { state } = useLocation();
-  const room = state?.roomData;
-  console.log("Room data:", state?.roomData);
+  
+  console.log("Room data:", room);
 
+ 
   return (
     <>
 
@@ -147,6 +183,7 @@ export default function Workspace() {
           chatOpen={true}
           onToggleChat={() => { }}
           room={room}
+          socket = {socket}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
@@ -159,6 +196,7 @@ export default function Workspace() {
               activeTab={sidebarTab}
               onTab={handleSidebarTab}
               onSettings={() => openModal("settings")}
+              room={room}
 
             />
           </div>
@@ -186,39 +224,7 @@ export default function Workspace() {
 
               {/* Editor */}
               <div className="ws-editor-area" style={{ flex: 1 }}>
-                <Editor
-                  height="100%"
-                  language={currentLang}
-                  defaultValue={room.code}
-                  theme="vs-dark"
-                  options={{
-                    fontSize: 13,
-                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                    fontLigatures: true,
-                    lineHeight: 1.7,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    padding: { top: 14, bottom: 14 },
-                    renderLineHighlight: "gutter",
-                    cursorBlinking: "smooth",
-                    cursorSmoothCaretAnimation: "on",
-                    smoothScrolling: true,
-                    tabSize: 2,
-                    wordWrap: "on",
-                    automaticLayout: true,
-                    scrollbar: {
-                      verticalScrollbarSize: 4,
-                      horizontalScrollbarSize: 4,
-                    },
-                    overviewRulerLanes: 0,
-                    hideCursorInOverviewRuler: true,
-                    lineNumbers: "on",
-                    glyphMargin: false,
-                    folding: true,
-                    bracketPairColorization: { enabled: true },
-                    suggest: { showWords: false },
-                  }}
-                />
+                <MainEditor room={room} currentLang={currentLang} />
               </div>
 
               {/* Terminal resize handle */}
@@ -252,7 +258,7 @@ export default function Workspace() {
         </div>
 
         {/* ── Status bar ──────────────────────────────────────────────── */}
-        <StatusBar />
+        <StatusBar room={room} />
 
         {/* ── Mobile bottom tabs ──────────────────────────────────────── */}
         <div className="ws-mobile-tabs">
