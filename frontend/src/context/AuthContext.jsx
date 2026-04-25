@@ -14,7 +14,11 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         if(token){
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            setIsLogin(true);  
+            const res = await axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true })
+                setUser(res.data);
+                setIsLogin(true);
+                console.log(res);
+                
         }
         else{
             delete axios.defaults.headers.common["Authorization"];
