@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
 import { UsersIcon } from "./ui/Icons.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
   // const now = new Date();
@@ -49,11 +53,11 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
         </div>
         <div>
           <div className="font-display font-semibold" style={{ fontSize: "0.88rem", color: "#F9FAFB", lineHeight: 1.2 }}>
-            {room.name}
+            {room.roomName}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 3 }}>
             <UsersIcon />
-            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.members} members</span>
+            <span style={{ fontSize: "0.7rem", color: "#6B7280" }}>{room.participants.length+1} members</span>
           </div>
         </div>
       </div>
@@ -73,7 +77,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
       display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
       overflow: "hidden",
     }}>
-      {room.desc}
+      {room.description || "No description provided."}
     </p>
 
     {/* Footer */}
@@ -84,7 +88,8 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {/* Delete button */}
-        <button
+        {deleteRoom &&
+        <button 
           onClick={e => e.stopPropagation()}
           style={{
             width: 26, height: 26, borderRadius: 7, border: "none",
@@ -99,7 +104,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
           }}
           onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.18)"}
           onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}
-        >🗑</button>
+        >🗑</button>}
         <button className="db-card-btn" >
           {isLive ? "Open" : "Resume"}
         </button>
@@ -109,3 +114,4 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
 );
 }
 export default RoomCard;
+

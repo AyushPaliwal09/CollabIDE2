@@ -1,9 +1,9 @@
 import axios from "axios";
+import { useAuth } from "../context/AuthContext.jsx";
 import { io } from "socket.io-client";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
-import {useAuth} from "../context/AuthContext.jsx"
 import TabsBar from "../components/TabsBar.jsx";
 import Terminal from "../components/Terminal.jsx";
 import { FileCodeIcon, FilesIcon } from "../components/ui/Icons.jsx";
@@ -82,6 +82,7 @@ export default function Workspace() {
     
 //   }
 //   }, [room?._id, user]);
+
 
   // ── Monaco language per file tab ──────────────────────────────────────────
   

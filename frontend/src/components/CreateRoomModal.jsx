@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
-const CreateRoomModal = ({ onClose }) => {
+const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
   const [interviewMode, setInterviewMode] = useState(false);
   const [roomData, setRoomData] = useState({roomName:"", description:""})
   const navigate = useNavigate()
@@ -19,13 +19,14 @@ const CreateRoomModal = ({ onClose }) => {
     setRoomData({...roomData, [e.target.name]:e.target.value})
   }
   const handleSubmit=async()=>{
-    try {
-        if(!roomData.description|| !roomData.roomName){
-      return alert("Please fill all the filed")
+    if(!roomData.description || !roomData.roomName){
+      return alert("please fill all the fields")
     }
+    try {
       const res = await axios.post("http://localhost:5000/room/create-room",{
        roomName: roomData.roomName,
        description: roomData.description,
+        interviewMode: interviewMode
       },
       {
       headers: {

@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight, LinkIcon, PlayIcon, PowerIcon } from "./ui/I
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
-import {useAuth} from "../context/AuthContext.jsx"
+import { useAuth } from "../context/AuthContext.jsx";
+
 
 const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room, handleLeave }) => {
   const navigate = useNavigate()

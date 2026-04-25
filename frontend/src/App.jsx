@@ -22,7 +22,7 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
           <Route path="/room/join-room/:id" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
-          <Route path="/room/roompage" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="/room/roompage/:id" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
         </Routes>
        </div>
      </AuthProvider>

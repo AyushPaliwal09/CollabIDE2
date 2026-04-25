@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, use } from "react";
+import axios from "axios";
 import DashboardHeader from "../components/DashboardHeader.jsx";
 import RoomCard from "../components/RoomCard.jsx";
 import EmptyState from "../components/EmptyState.jsx";
@@ -9,13 +9,19 @@ import  JoinRoomModal  from "../components/JoinRoomModal.jsx";
 import CreateRoomModal  from "../components/CreateRoomModal.jsx";
 import { ROOMS } from "../data/Room.js";
 import DashboardNavbar from "../components/DashboardNavbar.jsx";
+import {useAuth} from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
   const [hasRooms, setHasRooms] = useState(true);        // toggle to false to see empty state
  
   const openModal  = (type) => setModal(type);
   const closeModal = () => setModal(null);
- 
+  const {user} = useAuth();
+  const [rooms, setRooms] = useState([]);
+  const [refreshRooms, setRefreshRooms] = useState(0);
+  const navigate = useNavigate()
   // close modal on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") closeModal(); };
@@ -54,8 +60,6 @@ export default function Dashboard() {
   };
   return (
     <>
-     
- 
       {/* ── Fixed navbar ── */}
       <DashboardNavbar
         onCreateRoom={() => openModal("create")}
@@ -107,14 +111,14 @@ export default function Dashboard() {
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
                 gap: 14,
-              }}
-            >
-              {ROOMS.map((room, i) => (
-                <RoomCard
-                  key={room.id}
-                  room={room}
-                  delay={Math.min(i + 1, 6)}
-                />
+              }} 
+            >{console.log("rendering rooms:", rooms)}
+              {rooms.map((room, i) => (
+                <RoomCard room={room} delay={i}
+                  key={room._id}
+                  setRefreshRooms={setRefreshRooms}
+                  onClick={() => handleJoinRoom(room._id)}
+                         />
               ))}
             </div>
           ) : (
@@ -127,8 +131,8 @@ export default function Dashboard() {
       </main>
  
       {/* ── Modals ── */}
-      {modal === "create"   && <CreateRoomModal  onClose={closeModal} />}
-      {modal === "join"     && <JoinRoomModal    onClose={closeModal}  />}
+      {modal === "create"   && <CreateRoomModal  onClose={closeModal} setRefreshRooms={setRefreshRooms} />}
+      {modal === "join"     && <JoinRoomModal    onClose={closeModal} setRefreshRooms={setRefreshRooms} />}
       {modal === "settings" && <SettingsModal    onClose={closeModal} />}
 
       {/* ── Footer ── */}
