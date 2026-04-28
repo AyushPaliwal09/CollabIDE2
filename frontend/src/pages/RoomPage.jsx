@@ -112,9 +112,16 @@ export default function Workspace() {
 
   const socket = socketRef.current;
 
-  socket.on("connect", () => {
-    socket.emit("join-room", id, user);
-  });
+   socket.on("connect", () => {
+      console.log("Connected to socket server with ID:", socket.id);
+      socket.on("connect_error", (err) => {
+        console.error("Connection error:", err);
+      });
+      socket.emit("join-room", state?.roomData?._id, user);
+    });
+  // socket.on("connect", () => {
+  //   socket.emit("join-room", id, user);
+  // });
 
 }, [id, user]);
   const currentLang = tabs.find(t => t.id === activeTab)?.lang ?? "javascript";
