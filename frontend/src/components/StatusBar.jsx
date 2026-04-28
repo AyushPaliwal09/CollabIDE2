@@ -6,7 +6,7 @@ const StatusBar = ({ room }) => (
       <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#22C55E" }} />
       Connected
     </div>
-    <div className="ws-status-item">{room.language}</div>
+    <div className="ws-status-item">{room?.language}</div>
     <div className="ws-status-item">UTF-8</div>
     <div className="ws-status-item">Ln 12, Col 8</div>
     <div style={{ flex: 1 }} />

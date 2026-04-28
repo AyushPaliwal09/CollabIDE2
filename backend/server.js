@@ -22,17 +22,52 @@ const io = new Server(server, {
     credentials: true
   }
 })
+const rooms = {}
 
 io.on("connection", (socket) => {
   console.log("User connected : ", socket.id);
 
   //JOIN ROOM
-  socket.on("join-room", (roomId) => {
-    socket.join(roomId)
-    console.log(`User ${socket.id} joined room ${roomId}`);
+  // socket.on("join-room", (roomId) => {
+  //   socket.join(roomId)
+  //   console.log(`User ${socket.id} joined room ${roomId}`);
 
-  })
+  // })
+   
+  socket.on("join-room", ({ roomId, user }) => {
+    if (!roomId || !user) return;
 
+    socket.join(roomId);
+    socket.roomId = roomId;
+
+    if (!rooms[roomId]) rooms[roomId] = { users: [], code: "", language: "javascript", editor: null };
+
+   
+    rooms[roomId].users = rooms[roomId].users.filter(u => u.socket !== socket.id);
+
+    // add this socket
+    rooms[roomId].users.push({
+      socket: socket.id,
+      id: user.id,
+      name: user.username || user.name || "Unknown"
+    });
+
+    // send full user list to everyone in room
+    io.to(roomId).emit("online-users", rooms[roomId].users);
+
+    // send current code and language to newly joined socket only
+    socket.emit("update-code", rooms[roomId].code);
+    socket.emit("language-changed", rooms[roomId].language);
+    socket.emit("editor-updated", rooms[roomId].editor || null); 
+  });
+
+  // code change from a client -> save to room and broadcast to other sockets
+  socket.on("code-change", ({ roomId, code }) => {
+    if (!roomId) return;
+    if (!rooms[roomId]) rooms[roomId] = { users: [], code: "", language: "javascript", editor: null };
+    rooms[roomId].code = code;
+    socket.to(roomId).emit("update-code", code);
+  });
 
   // leave room
   socket.on("leave-room", ({ roomId, userId }) => {
