@@ -39,33 +39,46 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
     socket.roomId = roomId;
+    console.log(`${user.username} joined room ${roomId} with socket id ${socket.id}`);
 
-    if (!rooms[roomId]) rooms[roomId] = { users: [], code: "", language: "javascript", editor: null };
+    if (!rooms[roomId]) rooms[roomId] = { users: [], code: "", language: "javascript" }; 
 
-   
-    rooms[roomId].users = rooms[roomId].users.filter(u => u.socket !== socket.id);
+    rooms[roomId].users = rooms[roomId].users.filter(u => u.socket !== socket.id);  
 
     // add this socket
+
+    // if(!rooms[roomId].users.some(u => u.id === user.id)) {
+    //   rooms[roomId].users.push({ socket: socket.id, id: user.id, username: user.username }); 
+    // }
     rooms[roomId].users.push({
       socket: socket.id,
-      id: user.id,
+      id: user._id,
       name: user.username || user.name || "Unknown"
     });
 
     // send full user list to everyone in room
     io.to(roomId).emit("online-users", rooms[roomId].users);
+    console.log("online users in room", roomId, rooms[roomId].users);
 
     // send current code and language to newly joined socket only
     socket.emit("update-code", rooms[roomId].code);
     socket.emit("language-changed", rooms[roomId].language);
     socket.emit("editor-updated", rooms[roomId].editor || null); 
   });
-
+socket.on("chat-message", ({ roomId, message, user }) => {
+  // console.log("Received chat message:", { roomId, message, user });
+    if (!roomId || !message || !user) return;
+    socket.broadcast.to(roomId).emit("chat-message", { message, user });
+    // console.log(message, user);
+    // console.log("Sending message to room", roomId);
+  });
   // code change from a client -> save to room and broadcast to other sockets
   socket.on("code-change", ({ roomId, code }) => {
     if (!roomId) return;
+    // console.log("Received code change for room", roomId);
     if (!rooms[roomId]) rooms[roomId] = { users: [], code: "", language: "javascript", editor: null };
     rooms[roomId].code = code;
+    // console.log("code", code);
     socket.to(roomId).emit("update-code", code);
   });
 
@@ -81,6 +94,15 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User Disconnected:", socket.id);
+      // find the room and user that left
+    for (const roomId in rooms) {
+      const userIndex = rooms[roomId].users.findIndex(u => u.socket === socket.id); // find the user that left
+      if (userIndex !== -1) {
+        const user = rooms[roomId].users[userIndex]; // get the user that left
+        rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
+        io.to(roomId).emit("user-left", user.id); // notify others in the room
+      }
+    }
   });
 })
 

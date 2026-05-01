@@ -33,98 +33,114 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   const socketRef = useRef(null);
   const { user } = useAuth();
-  const { id } = useParams();
+  const { roomId } = useParams();
   const { state } = useLocation();
-  console.log(id);
+  console.log(roomId);
   const [room, setRoom] = useState(() => {
-  const saved = localStorage.getItem("roomData");
-  return saved ? JSON.parse(saved).data : null;
-});
+    const saved = localStorage.getItem("roomData");
+    return saved ? JSON.parse(saved).data : null;
+  });
   console.log("Initial room data from location state:", room);
   console.log("User data from auth context:", user);
-  const socket = socketRef.current;
-  
-//   useEffect(() => {
-//     console.log("useEffect called");
 
-//     console.log(id);
 
-//     async function fetchRoom() {
+  //   useEffect(() => {
+  //     console.log("useEffect called");
 
-//       const res = await axios.get(`http://localhost:5000/room/get-room/${id}`, { withCredentials: true });
-//       console.log("Fetched room result:", res);
-//       localStorage.setItem("roomData", JSON.stringify({ data: res.data }))
-//       setRoom(res.data ?? roomData);
-//     }
-//     fetchRoom();
-//     if (!socketRef.current) {
-//       socketRef.current = io("http://localhost:5000", {
-//         withCredentials: true,
-//         transports: ['websocket'],
-//         forceNew: true,
-//       });
-//     }
-//     const socket = socketRef.current;
+  //     console.log(id);
 
-//     socket.on("connect", () => {
-//       console.log("Connected to socket server with ID:", socket.id);
-//       socket.on("connect_error", (err) => {
-//         console.error("Connection error:", err);
-//       });
-//       socket.emit("join-room", state?.roomData?._id, user);
-//     });
-// const roomData = JSON.parse(localStorage.getItem("roomData"))
-//   if (roomData) {
-//     setRoom(roomData.data)
-//     console.log("hello");
-    
-//   }
-//   }, [room?._id, user]);
+  //     async function fetchRoom() {
+
+  //       const res = await axios.get(`http://localhost:5000/room/get-room/${id}`, { withCredentials: true });
+  //       console.log("Fetched room result:", res);
+  //       localStorage.setItem("roomData", JSON.stringify({ data: res.data }))
+  //       setRoom(res.data ?? roomData);
+  //     }
+  //     fetchRoom();
+  //     if (!socketRef.current) {
+  //       socketRef.current = io("http://localhost:5000", {
+  //         withCredentials: true,
+  //         transports: ['websocket'],
+  //         forceNew: true,
+  //       });
+  //     }
+  //     const socket = socketRef.current;
+
+  //     socket.on("connect", () => {
+  //       console.log("Connected to socket server with ID:", socket.id);
+  //       socket.on("connect_error", (err) => {
+  //         console.error("Connection error:", err);
+  //       });
+  //       socket.emit("join-room", state?.roomData?._id, user);
+  //     });
+  // const roomData = JSON.parse(localStorage.getItem("roomData"))
+  //   if (roomData) {
+  //     setRoom(roomData.data)
+  //     console.log("hello");
+
+  //   }
+  //   }, [room?._id, user]);
 
 
   // ── Monaco language per file tab ──────────────────────────────────────────
-  
+
   useEffect(() => {
-  async function fetchRoom() {
-    const res = await axios.get(
-      `http://localhost:5000/room/get-room/${id}`,
-      { withCredentials: true }
-    );
+    console.log("useEffect for room data and socket connection")
+    async function fetchRoom() {
+      const res = await axios.get(
+        `http://localhost:5000/room/get-room/${roomId}`,
+        { withCredentials: true }
+      );
 
-    setRoom(res.data);
-    localStorage.setItem(
-      "roomData",
-      JSON.stringify({ data: res.data })
-    );
-  }
+      setRoom(res.data);
+      console.log("Fetched room data:", room);
+      localStorage.setItem(
+        "roomData",
+        JSON.stringify({ data: res.data })
+      );
+    }
 
-  fetchRoom();
+    fetchRoom();
 
-  if (!socketRef.current) {
-    socketRef.current = io("http://localhost:5000", {
-      withCredentials: true,
-      transports: ["websocket"],
-      forceNew: true,
-    });
-  }
+    const initSocket = () => {
+      if (!socketRef.current) {
+        socketRef.current = io("http://localhost:5000", {
+          withCredentials: true,
+          transports: ["websocket"],
+          forceNew: true,
+        });
+      }
 
-  const socket = socketRef.current;
+      const socket = socketRef.current;
+      console.log("Socket reference:", socket);
 
-   socket.on("connect", () => {
-      console.log("Connected to socket server with ID:", socket.id);
-      socket.on("connect_error", (err) => {
-        console.error("Connection error:", err);
+      socket.on("connect", () => {
+        console.log("Connected to socket server with ID:", socket.id);
+        socket.on("connect_error", (err) => {
+          console.error("Connection error:", err);
+        });
+        socket.emit("join-room", { roomId, user });
       });
-      socket.emit("join-room", state?.roomData?._id, user);
-    });
-  // socket.on("connect", () => {
-  //   socket.emit("join-room", id, user);
-  // });
 
-}, [id, user]);
+      const onOnline = (users) => setOnlineUsers(users || []);
+      socket.on("online-users", onOnline);
+      console.log("online users:", onlineUsers);
+     
+  
+
+      return () => {
+        socket.off("online-users", onOnline);
+      };
+    }
+    initSocket();
+
+  }, [roomId, user]);
   const currentLang = tabs.find(t => t.id === activeTab)?.lang ?? "javascript";
+  console.log("online users:", onlineUsers);
 
   // ── Sidebar tab toggle: click same → toggle open ──────────────────────────
   const handleSidebarTab = useCallback((tab) => {
@@ -263,10 +279,28 @@ export default function Workspace() {
   //       // stay on same page
   //       window.history.pushState(null, "", window.location.href);
   //     }
-    
+
 
 
   // }, []);
+
+  const getFirstLetter = (name) => {
+    return name?.charAt(0).toUpperCase();
+  };
+
+  const colors = ["#8B5CF6", "#EC4899", "#22C55E", "#3B82F6", "#F59E0B"];
+
+  const getAvatarColor = (id) => {
+    let hash = 0;
+
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
+
 
   return (
     <>
@@ -281,7 +315,10 @@ export default function Workspace() {
           onToggleChat={() => { }}
           room={room}
           handleLeave={handleLeave}
-          socket={socket}
+          socket={socketRef.current}
+          onlineUsers={onlineUsers}
+          getAvatarColor={getAvatarColor}
+          getFirstLetter={getFirstLetter}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
@@ -295,7 +332,11 @@ export default function Workspace() {
               onTab={handleSidebarTab}
               onSettings={() => openModal("settings")}
               room={room}
-
+              socket={socketRef.current}
+              onlineUsers={onlineUsers}
+              userId={user._id}
+              getAvatarColor={getAvatarColor}
+              getFirstLetter={getFirstLetter}
             />
           </div>
 
@@ -322,7 +363,7 @@ export default function Workspace() {
 
               {/* Editor */}
               <div className="ws-editor-area" style={{ flex: 1 }}>
-                <MainEditor room={room} currentLang={currentLang} />
+                <MainEditor room={room} currentLang={currentLang} socket={socketRef.current} />
               </div>
 
               {/* Terminal resize handle */}
@@ -351,12 +392,13 @@ export default function Workspace() {
           />
 
           {/* ── Chat panel ──────────────────────────────────────────── */}
-          <Chat width={chatWidth} />
+          {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}
+          <Chat width={chatWidth} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
 
         </div>
 
         {/* ── Status bar ──────────────────────────────────────────────── */}
-        <StatusBar room={room} />
+        <StatusBar room={room} onlineUsers={onlineUsers} />
 
         {/* ── Mobile bottom tabs ──────────────────────────────────────── */}
         <div className="ws-mobile-tabs">
