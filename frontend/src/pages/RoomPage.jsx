@@ -1,6 +1,3 @@
-import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
-import { io } from "socket.io-client";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -8,16 +5,15 @@ import TabsBar from "../components/TabsBar.jsx";
 import Terminal from "../components/Terminal.jsx";
 import { FileCodeIcon, FilesIcon } from "../components/ui/Icons.jsx";
 import Sidebar from "../components/Sidebar.jsx";
+import Editor from "@monaco-editor/react";
 import { DEFAULT_CODE, TABS } from "../data/MockData.js";
 import { useState, useEffect, useRef, useCallback } from "react";
 import SettingsModal from "../components/SettingModal.jsx";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import MainEditor from "../components/MainEditor.jsx";
 
 
 
 export default function Workspace() {
-
+  
   // ── Panel state ────────────────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarTab, setSidebarTab] = useState("users");
@@ -33,90 +29,8 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
-  const socketRef = useRef(null);
-  const { user } = useAuth();
-  const { id } = useParams();
-  const { state } = useLocation();
-  console.log(id);
-  const [room, setRoom] = useState(() => {
-  const saved = localStorage.getItem("roomData");
-  return saved ? JSON.parse(saved).data : null;
-});
-  console.log("Initial room data from location state:", room);
-  console.log("User data from auth context:", user);
-  const socket = socketRef.current;
-  
-//   useEffect(() => {
-//     console.log("useEffect called");
-
-//     console.log(id);
-
-//     async function fetchRoom() {
-
-//       const res = await axios.get(`http://localhost:5000/room/get-room/${id}`, { withCredentials: true });
-//       console.log("Fetched room result:", res);
-//       localStorage.setItem("roomData", JSON.stringify({ data: res.data }))
-//       setRoom(res.data ?? roomData);
-//     }
-//     fetchRoom();
-//     if (!socketRef.current) {
-//       socketRef.current = io("http://localhost:5000", {
-//         withCredentials: true,
-//         transports: ['websocket'],
-//         forceNew: true,
-//       });
-//     }
-//     const socket = socketRef.current;
-
-//     socket.on("connect", () => {
-//       console.log("Connected to socket server with ID:", socket.id);
-//       socket.on("connect_error", (err) => {
-//         console.error("Connection error:", err);
-//       });
-//       socket.emit("join-room", state?.roomData?._id, user);
-//     });
-// const roomData = JSON.parse(localStorage.getItem("roomData"))
-//   if (roomData) {
-//     setRoom(roomData.data)
-//     console.log("hello");
-    
-//   }
-//   }, [room?._id, user]);
-
 
   // ── Monaco language per file tab ──────────────────────────────────────────
-  
-  useEffect(() => {
-  async function fetchRoom() {
-    const res = await axios.get(
-      `http://localhost:5000/room/get-room/${id}`,
-      { withCredentials: true }
-    );
-
-    setRoom(res.data);
-    localStorage.setItem(
-      "roomData",
-      JSON.stringify({ data: res.data })
-    );
-  }
-
-  fetchRoom();
-
-  if (!socketRef.current) {
-    socketRef.current = io("http://localhost:5000", {
-      withCredentials: true,
-      transports: ["websocket"],
-      forceNew: true,
-    });
-  }
-
-  const socket = socketRef.current;
-
-  socket.on("connect", () => {
-    socket.emit("join-room", id, user);
-  });
-
-}, [id, user]);
   const currentLang = tabs.find(t => t.id === activeTab)?.lang ?? "javascript";
 
   // ── Sidebar tab toggle: click same → toggle open ──────────────────────────
@@ -169,7 +83,6 @@ export default function Workspace() {
 
   // ── Global mouse move / up ─────────────────────────────────────────────────
   useEffect(() => {
-    console.log("useEffect for Chat resize")
     const onMove = (e) => {
       if (chatResizing.current) {
         const delta = chatStartX.current - e.clientX;
@@ -217,50 +130,6 @@ export default function Workspace() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-
-  console.log("Room data:", room);
-
-  const navigate = useNavigate();
-  const handleLeave = async () => {
-    const res = await axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
-    socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId });
-    console.log("Leave room");
-
-    navigate("/dashboard")
-  }
-  // useEffect(() => {
-  //   const handleBack = async () => {
-  //     await handleLeave();
-  //   };
-
-  //   window.addEventListener("popstate", handleBack);
-
-  //   return () => {
-  //     window.removeEventListener("popstate", handleBack);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   // keep current page in history
-  //   window.history.pushState(null, "", window.location.href);
-
-  //   const handleBack = async () => {
-  //     // const confirmLeave = window.confirm(
-  //     //   "Do you want to leave the room?"
-  //     // );
-
-  //     // if (confirmLeave) {
-  //       await handleLeave();
-  //       navigate("/dashboard"); // where you want to go
-  //     // } else {
-  //       // stay on same page
-  //       window.history.pushState(null, "", window.location.href);
-  //     }
-    
-
-
-  // }, []);
-
   return (
     <>
 
@@ -272,9 +141,6 @@ export default function Workspace() {
           onToggleSidebar={() => setSidebarOpen(v => !v)}
           chatOpen={true}
           onToggleChat={() => { }}
-          room={room}
-          handleLeave={handleLeave}
-          socket={socket}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
@@ -287,7 +153,6 @@ export default function Workspace() {
               activeTab={sidebarTab}
               onTab={handleSidebarTab}
               onSettings={() => openModal("settings")}
-              room={room}
 
             />
           </div>
@@ -315,7 +180,39 @@ export default function Workspace() {
 
               {/* Editor */}
               <div className="ws-editor-area" style={{ flex: 1 }}>
-                <MainEditor room={room} currentLang={currentLang} />
+                <Editor
+                  height="100%"
+                  language={currentLang}
+                  defaultValue={DEFAULT_CODE}
+                  theme="vs-dark"
+                  options={{
+                    fontSize: 13,
+                    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                    fontLigatures: true,
+                    lineHeight: 1.7,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    padding: { top: 14, bottom: 14 },
+                    renderLineHighlight: "gutter",
+                    cursorBlinking: "smooth",
+                    cursorSmoothCaretAnimation: "on",
+                    smoothScrolling: true,
+                    tabSize: 2,
+                    wordWrap: "on",
+                    automaticLayout: true,
+                    scrollbar: {
+                      verticalScrollbarSize: 4,
+                      horizontalScrollbarSize: 4,
+                    },
+                    overviewRulerLanes: 0,
+                    hideCursorInOverviewRuler: true,
+                    lineNumbers: "on",
+                    glyphMargin: false,
+                    folding: true,
+                    bracketPairColorization: { enabled: true },
+                    suggest: { showWords: false },
+                  }}
+                />
               </div>
 
               {/* Terminal resize handle */}
@@ -349,7 +246,7 @@ export default function Workspace() {
         </div>
 
         {/* ── Status bar ──────────────────────────────────────────────── */}
-        <StatusBar room={room} />
+        <StatusBar />
 
         {/* ── Mobile bottom tabs ──────────────────────────────────────── */}
         <div className="ws-mobile-tabs">
