@@ -72,7 +72,7 @@ const Sidebar = ({ open, activeTab, onTab, onSettings, onlineUsers, userId, getA
             {activeTab === "users" && (
               <div style={{ padding: "4px 0" }}>
                 {onlineUsers.map((u, i) => (
-                  <div key={i} className="ws-user-row">
+                  <div key={u.id} className="ws-user-row">
                     <div style={{
                       width: 26, height: 26, borderRadius: "50%",
                       background: getAvatarColor(u.id), display: "flex", alignItems: "center",
