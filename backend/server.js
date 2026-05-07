@@ -13,7 +13,7 @@ dotenv.config()
 connectDB()
 const app = express()
 const server = http.createServer(app)
-const PORT = process.env.PORT
+const PORT =5000 
 
 const io = new Server(server, {
   cors: {
