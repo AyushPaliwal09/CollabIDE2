@@ -204,7 +204,7 @@ export const updateRoomCodeController = async (req, res) => {
     try {
         const { id } = req.params;
         const { code } = req.body;
-        console.log(code);
+        // console.log("code",code ,"roomId", id);
         const room = await Room.findByIdAndUpdate(id, { code }, { new: true });
         if (!room) {
             return res.status(404).json({ message: "Room not found" });

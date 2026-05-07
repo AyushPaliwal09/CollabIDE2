@@ -21,8 +21,9 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
-          <Route path="/room/join-room/:id" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
-          <Route path="/room/roompage/:id" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="/room/join-room/:roomId" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
+          <Route path="/room/roompage/:roomId" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
        </div>
      </AuthProvider>
