@@ -13,7 +13,7 @@ dotenv.config()
 connectDB()
 const app = express()
 const server = http.createServer(app)
-const PORT = process.env.PORT
+const PORT =5000 
 
 const io = new Server(server, {
   cors: {
@@ -22,20 +22,16 @@ const io = new Server(server, {
     credentials: true
   }
 })
-const rooms = {}
 
 io.on("connection", (socket) => {
   console.log("User connected : ", socket.id);
 
   //JOIN ROOM
-  // socket.on("join-room", (roomId) => {
-  //   socket.join(roomId)
-  //   console.log(`User ${socket.id} joined room ${roomId}`);
+  socket.on("join-room", (roomId) => {
+    socket.join(roomId)
+    console.log(`User ${socket.id} joined room ${roomId}`);
 
-  // })
-   
-  socket.on("join-room", ({ roomId, user }) => {
-    if (!roomId || !user) return;
+  })
 
     socket.join(roomId);
     socket.roomId = roomId;

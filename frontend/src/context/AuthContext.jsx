@@ -16,10 +16,10 @@ export const AuthProvider = ({ children }) => {
             try{
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             const res = await axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true })
+            
                 setUser(res.data);
                 setIsLogin(true);
-                console.log(res);
-                
+      
         }
         catch(error){
             delete axios.defaults.headers.common["Authorization"]

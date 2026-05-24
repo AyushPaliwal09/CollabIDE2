@@ -112,9 +112,9 @@ export const joinRoomController = async (req, res) => {
         const isAlreadyRoom = user.rooms.some(p => p && p.equals(roomObjectId)
         );
 
-        // if (isAlreadyRoom) {
-        //     return res.status(400).json({ message: "room already there" });
-        // }
+        if (isAlreadyRoom) {
+            return res.status(400).json({ message: "room already there" });
+        }
         user.rooms.push(roomObjectId)
         await user.save()
         room.participants.push(userObjectId);
