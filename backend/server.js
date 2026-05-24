@@ -126,6 +126,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+app.set("trust proxy", 1);
 app.use(cors());
 app.use("/api/auth", userRouter)
 app.use("/room", roomRouter)
