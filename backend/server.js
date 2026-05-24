@@ -18,8 +18,8 @@ const PORT = process.env.PORT
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    // methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "https://collabide-sjuu.onrender.com",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 })
