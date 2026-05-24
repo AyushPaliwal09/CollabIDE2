@@ -26,7 +26,6 @@ const roomSchema = mongoose.Schema({
     },
     code: {
     type: String,
-    default: "// Start coding here..."
   },
 
   language: {

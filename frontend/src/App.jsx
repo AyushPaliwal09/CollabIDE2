@@ -6,7 +6,7 @@ import {Routes, Route} from 'react-router-dom'
 import Dashboard from './pages/Dashboard.jsx'
 import JoinRoomModal from './components/JoinRoomModal.jsx'
 import RoomPage from './pages/RoomPage.jsx'
-
+import NotFoundPage from './pages/NotFoundPage.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
@@ -21,8 +21,9 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>
           } />
-          <Route path="/room/join-room/:id" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
-          <Route path="/room/roompage/:id" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="/room/join-room/:roomId" element={<ProtectedRoute><JoinRoomModal /></ProtectedRoute>} />
+          <Route path="/room/roompage/:roomId" element={<ProtectedRoute><RoomPage /></ProtectedRoute>} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
        </div>
      </AuthProvider>

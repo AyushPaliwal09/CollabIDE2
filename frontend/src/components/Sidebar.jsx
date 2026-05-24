@@ -1,13 +1,14 @@
 import { FILE_TREE, USERS } from "../data/MockData.js";
 import { FileCodeIcon, FilesIcon, FolderIcon, SettingsIcon, TerminalIcon, UsersIcon } from "./ui/Icons.jsx";
 
-const Sidebar = ({ open, activeTab, onTab, onSettings }) => {
+const Sidebar = ({ open, activeTab, onTab, onSettings, onlineUsers, userId, getAvatarColor, getFirstLetter }) => {
   const TABS_META = [
     // { id: "files",    icon: <FilesIcon />,   label: "Files"    },
     { id: "users",    icon: <UsersIcon />,   label: "Users"    },
     { id: "terminal", icon: <TerminalIcon />, label: "Terminal" },
   ];
- 
+
+
   return (
     <>
       {/* Icon strip */}
@@ -70,17 +71,17 @@ const Sidebar = ({ open, activeTab, onTab, onSettings }) => {
             {/* USERS */}
             {activeTab === "users" && (
               <div style={{ padding: "4px 0" }}>
-                {USERS.map((u, i) => (
-                  <div key={i} className="ws-user-row">
+                {onlineUsers?.map((u, i) => (
+                  <div key={u.id} className="ws-user-row">
                     <div style={{
                       width: 26, height: 26, borderRadius: "50%",
-                      background: u.color, display: "flex", alignItems: "center",
+                      background: getAvatarColor(u.id), display: "flex", alignItems: "center",
                       justifyContent: "center", fontSize: 10, color: "#fff",
                       fontWeight: 700, flexShrink: 0,
-                    }}>{u.initial}</div>
+                    }}>{getFirstLetter(u.name)}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: "11px", color: "#D1D5DB", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {u.name}{u.you && <span style={{ color: "#4B5563", marginLeft: 4 }}>(you)</span>}
+                        {u.name}{u.id === userId && <span style={{ color: "#4B5563", marginLeft: 4 }}>(you)</span>}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 1 }}>
                         {u.status === "typing" ? (

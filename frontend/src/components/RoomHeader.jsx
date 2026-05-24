@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 
 
-const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room, handleLeave }) => {
+const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room, handleLeave, onlineUsers, getAvatarColor, getFirstLetter, userId }) => {
   const navigate = useNavigate()
 const { user } = useAuth()
 
@@ -66,15 +66,15 @@ const { user } = useAuth()
 
       {/* Active user avatars */}
       <div style={{ display: "flex", alignItems: "center" }}>
-        {USERS.map((u, i) => (
-          <div key={u.name} title={u.name + (u.you ? " (You)" : "")}
+        {onlineUsers?.map((u, i) => (
+          <div key={u.id} title={u.name + (u.id === userId ? " (You)" : "")}
             className="ws-user-avatar"
-            style={{ background: u.color, marginLeft: i > 0 ? -6 : 0, zIndex: USERS.length - i }}>
-            {u.initial}
+            style={{ background: getAvatarColor(u.id), marginLeft: i > 0 ? -6 : 0, zIndex: onlineUsers.length - i }}>
+            {getFirstLetter(u.name)}
           </div>
         ))}
         <span style={{ fontSize: 10, color: "#4B5563", marginLeft: 6, whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>
-          {room?.activeUser?.length} online
+          {onlineUsers?.length} online
         </span>
       </div>
 
