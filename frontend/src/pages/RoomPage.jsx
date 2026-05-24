@@ -93,7 +93,7 @@ export default function Workspace() {
     async function fetchRoom() {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/room/get-room/${roomId}`,
-        { withCredentials: true }
+        // { withCredentials: true }
       );
 
       setRoom(res.data);
@@ -109,7 +109,7 @@ export default function Workspace() {
     const initSocket = () => {
       if (!socketRef.current) {
         socketRef.current = io(`${import.meta.env.VITE_BACKEND_URL}`, {
-          withCredentials: true,
+          // withCredentials: true,
           transports: ["websocket"],
           forceNew: true,
         });
