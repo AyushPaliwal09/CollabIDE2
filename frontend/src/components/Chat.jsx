@@ -98,12 +98,12 @@ const Chat = ({ width, socket, onlineUsers, room, user, getAvatarColor }) => {
         ))}
 
         {/* Typing indicator */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+        {/* <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
           <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#EC4899", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, color: "#fff", fontWeight: 700 }}>S</div>
           <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "2px 8px 8px 8px", padding: "6px 10px", display: "flex", alignItems: "center", gap: 2 }}>
             <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
           </div>
-        </div>
+        </div> */}
 
         <div ref={bottomRef} />
       </div>

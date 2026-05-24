@@ -12,11 +12,12 @@ const JoinRoomModal = ({onClose, setRefreshRooms}) => {
    try {
    // const res = await axios.post(`http://localhost:5000/room/join-room/${roomId}`)
    console.log("attempting to join room with id:", join.split("/").slice(-1)[0]);
-   const res = await axios.post(`http://localhost:5000/room/join-room/${join.split("/").slice(-1)[0]}`)
+   const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/join-room/${join.split("/").slice(-1)[0]}`)
     console.log(res);
 
     setRefreshRooms(prev => prev + 1);
     navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
+    // window.open(`/room/roompage/${res.data.room._id}`, "_blank");
    }catch (error) {
         console.log("room error:", error)
         alert("Invalid or expired room link")

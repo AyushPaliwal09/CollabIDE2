@@ -7,6 +7,7 @@ import { connectDB } from "./db/connectDB.js"
 import userRouter from "./routes/user.route.js"
 import roomRouter from "./routes/room.route.js"
 import cookieParser from "cookie-parser"
+import { leaveRoomController } from "./controller/room.controller.js"
 
 
 dotenv.config()
@@ -88,6 +89,14 @@ socket.on("chat-message", ({ roomId, message, user }) => {
     socket.leave(roomId);
 
     console.log(`${userId} left ${roomId}`);
+      for (const roomId in rooms) {
+      const userIndex = rooms[roomId].users.findIndex(u => u.socket === socket.id); // find the user that left
+      if (userIndex !== -1) {
+        const user = rooms[roomId].users[userIndex]; // get the user that left
+        rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
+        io.to(roomId).emit("user-left", user.id); // notify others in the room
+      }
+    }
 
     io.to(roomId).emit("user-left", userId);
   });

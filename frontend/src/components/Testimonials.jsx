@@ -3,12 +3,12 @@ import  Badge from "./Badge";
 
 const Testimonials = () => {
   const reviews = [
-    { name: "Priya Sharma", role: "Frontend Engineer @ Razorpay", avatar: "#8B5CF6", quote: "CollabIDE made pair programming feel like we're sitting next to each other. It just works — instant, smooth, no lag." },
-    { name: "Marcus Chen", role: "Indie Dev & Open Source Contributor", avatar: "#EC4899", quote: "I've tried every collaborative editor out there. Nothing comes close to how seamless CollabIDE is. The cursor sync is magic." },
-    { name: "Aditi Nair", role: "Engineering Lead @ Groww", avatar: "#22C55E", quote: "We use it for technical interviews. Candidates love the live environment. Way better than anything else we've used." },
-    { name: "Luca Ferrara", role: "Fullstack Developer @ Remote", avatar: "#F59E0B", quote: "The fact that you don't need to install anything is a game changer. Share a link and you're in — that's it." },
-    { name: "Aman Verma", role: "CS Student, IIT Bombay", avatar: "#06B6D4", quote: "My study group uses CollabIDE every day. It's like Google Docs but for code — and way more fun to use." },
-    { name: "Neha Kapoor", role: "CTO @ BuildSpace", avatar: "#F97316", quote: "Shipped 30% faster since our team moved to CollabIDE. The version history alone has saved us multiple times." },
+    { name: "Anjali Sharma", role: "Frontend Engineer @ Razorpay", avatar: "#8B5CF6", quote: "CollabIDE made pair programming feel like we're sitting next to each other. It just works — instant, smooth, no lag." },
+    { name: "Monika Khade", role: "CTO @ BuildSpace", avatar: "#EC4899", quote: "I've tried every collaborative editor out there. Nothing comes close to how seamless CollabIDE is. The cursor sync is magic." },
+    { name: "Bhumika Singh", role: "Engineering Lead @ Groww", avatar: "#22C55E", quote: "We use it for technical interviews. Candidates love the live environment. Way better than anything else we've used." },
+    { name: "Rahul Mehta", role: "Fullstack Developer @ Remote", avatar: "#F59E0B", quote: "The fact that you don't need to install anything is a game changer. Share a link and you're in — that's it." },
+    { name: "Ayush Paliwal", role: "CS Student, IIT Bombay", avatar: "#06B6D4", quote: "My study group uses CollabIDE every day. It's like Google Docs but for code — and way more fun to use." },
+    { name: "Sneha Patel", role: "Indie Dev & Open Source Contributor", avatar: "#F97316", quote: "Shipped 30% faster since our team moved to CollabIDE. The version history alone has saved us multiple times." },
   ];
  
   return (

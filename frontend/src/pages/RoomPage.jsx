@@ -92,7 +92,7 @@ export default function Workspace() {
     console.log("useEffect for room data and socket connection")
     async function fetchRoom() {
       const res = await axios.get(
-        `http://localhost:5000/room/get-room/${roomId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/room/get-room/${roomId}`,
         { withCredentials: true }
       );
 
@@ -108,7 +108,7 @@ export default function Workspace() {
 
     const initSocket = () => {
       if (!socketRef.current) {
-        socketRef.current = io("http://localhost:5000", {
+        socketRef.current = io(`${import.meta.env.VITE_BACKEND_URL}`, {
           withCredentials: true,
           transports: ["websocket"],
           forceNew: true,
@@ -129,8 +129,12 @@ export default function Workspace() {
       const onOnline = (users) => setOnlineUsers(users || []);
       socket.on("online-users", onOnline);
       console.log("online users:", onlineUsers);
-     
-  
+
+      socket.on("leave-room", handleLeaveRoom);
+      socket.on("disconnect", () => {
+        console.log("Socket disconnected:", socket.id);
+        handleLeaveRoom();
+      });
 
       return () => {
         socket.off("online-users", onOnline);
@@ -245,9 +249,10 @@ export default function Workspace() {
 
   const navigate = useNavigate();
   const handleLeave = async () => {
-    const res = await axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
+    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/leave-room/${room._id}`)
     socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId });
     console.log("Leave room");
+    window.close();
 
     navigate("/dashboard")
   }
@@ -268,19 +273,97 @@ export default function Workspace() {
   //   window.history.pushState(null, "", window.location.href);
 
   //   const handleBack = async () => {
-  //     // const confirmLeave = window.confirm(
-  //     //   "Do you want to leave the room?"
-  //     // );
+  //     const confirmLeave = window.confirm(
+  //       "Do you want to leave the room?"
+  //     );
 
-  //     // if (confirmLeave) {
+  //     if (confirmLeave) {
   //       await handleLeave();
   //       navigate("/dashboard"); // where you want to go
-  //     // } else {
+  //     } else {
   //       // stay on same page
   //       window.history.pushState(null, "", window.location.href);
   //     }
+  //   }
 
 
+  // }, []);
+
+  // useEffect(() => {
+  //   // keep current page in history
+  //   window.history.pushState(null, "", window.location.href);
+
+  //   const handleBack = async () => {
+  //     const confirmLeave = window.confirm(
+  //       "Do you want to leave the room?"
+  //     );
+
+  //     if (confirmLeave) {
+  //       window.removeEventListener("popstate", handleBack);
+
+  //       await handleLeave();
+  //       // navigate("/dashboard"); // where you want to go
+  //       window.history.back();
+
+  //     } else {
+  //       // stay on same page
+  //       window.history.pushState(null, "", window.location.href);
+  //     }
+  //   };
+
+  //   window.addEventListener("popstate", handleBack);
+
+  //   return () => {
+  //     window.removeEventListener("popstate", handleBack);
+  //   };
+  // }, []);
+
+  const [showModal, setShowModal] = useState(false);
+
+useEffect(() => {
+  // create one fake history entry
+  window.history.pushState(null, "", window.location.href);
+
+  const handleBack = () => {
+    // restore current page immediately
+    window.history.pushState(null, "", window.location.href);
+
+    // open modal
+    setShowModal(true);
+  };
+
+  window.addEventListener("popstate", handleBack);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+  };
+}, []);
+
+const handleStay = () => {
+  setShowModal(false);
+};
+
+const handleLeaveRoom = async () => {
+  await handleLeave(); // your async leave function
+
+  // navigate manually
+  navigate("/dashboard", { replace: true });
+};
+
+  // useEffect(() => {
+
+  //   const handleBeforeUnload = () => {
+  //     handleLeave();
+  //   };
+
+  //   window.addEventListener("unload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener(
+  //       "unload",
+  //       handleBeforeUnload
+  //     );
+  //   };
 
   // }, []);
 
@@ -417,9 +500,45 @@ export default function Workspace() {
             </div>
           ))}
         </div>
+        
 
       </div>
+      
+      {
+  showModal && (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      
+      <div className="bg-white p-5 rounded-xl w-[300px]">
+        
+        <h2 className="text-xl font-semibold">
+          Leave Room?
+        </h2>
 
+        <p className="mt-2 text-gray-600">
+          Are you sure you want to leave this room?
+        </p>
+
+        <div className="flex justify-end gap-3 mt-5">
+          
+          <button
+            onClick={() => setShowModal(false)}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleLeaveRoom}
+            className="px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Leave
+          </button>
+
+        </div>
+      </div>
+    </div>
+  )
+}
       {modal === "settings" && <SettingsModal onClose={closeModal} />}
 
     </>

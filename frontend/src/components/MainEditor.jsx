@@ -19,7 +19,7 @@ const MainEditor = ({ room, currentLang , socket }) => {
 
     const saveCode = async () => {
         try {
-            await axios.put(`http://localhost:5000/room/update-room-code/${room._id}`, { code });
+            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/room/update-room-code/${room._id}`, { code });
             console.log("Code saved successfully");
         } catch (error) {
             console.error("Error saving code:", error);

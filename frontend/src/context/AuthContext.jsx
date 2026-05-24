@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
          if (token) {
             try{
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            const res = await axios.get("http://localhost:5000/api/auth/get-user", { withCredentials: true })
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/get-user`, { withCredentials: true })
                 setUser(res.data);
                 setIsLogin(true);
                 console.log(res);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (username, email, password) => {
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/signup", {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`, {
                 username,
                 email,
                 password
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/login", {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
                 email,
                 password
             }, { withCredentials: true });
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
 
     const firebaseLogin = async (username, email, uid) => {
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/firebase-auth", {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/firebase-auth`, {
                 username,
                 email,
                 uid

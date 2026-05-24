@@ -25,7 +25,7 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
    const { roomId } = useParams();
   const handleDeleteRoom = async () => {
     try {
-      await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/room/delete-room/${room._id}`);
       setRefreshRooms(prev => prev + 1);
       console.log(room);
       

@@ -32,7 +32,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchRooms() {
       console.log("fetching rooms for user:", user._id);
-      const res = await axios.post(`http://localhost:5000/room/fetch-rooms/${user._id}`);
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/fetch-rooms/${user._id}`);
       setRooms(res.data);
       console.log("these are rooms",res.data);
       setHasRooms(res.data.length > 0);
@@ -46,9 +46,10 @@ export default function Dashboard() {
         alert("Room not found");
         return;
       }
-      const res = await axios.post(`http://localhost:5000/room/rejoin-room/${roomId}`)
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/rejoin-room/${roomId}`);
       console.log("res:", res);
       navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
+      // window.open(`/room/roompage/${res.data.room._id}`, "_blank");
     } catch (error) {
       console.error("Error finding room:", error);
       alert("Error occurred while trying to join the room");
