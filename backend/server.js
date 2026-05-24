@@ -118,7 +118,7 @@ socket.on("chat-message", ({ roomId, message, user }) => {
 
 app.use(express.json())
 app.use(cookieParser())
-app.options("*", cors());
+app.use(cors());
 app.use(cors({
   origin: [
   "http://localhost:5173",
