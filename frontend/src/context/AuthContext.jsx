@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
          if (token) {
             try{
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/get-user`)
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/get-user`, { withCredentials: true })
                 setUser(res.data);
                 setIsLogin(true);
                 console.log(res);
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
                 username,
                 email,
                 password
-            },);
+            }, { withCredentials: true });
             console.log(res);
 
             setUser(res.data.user);
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
                 email,
                 password
-            });
+            }, { withCredentials: true });
             console.log(res)
             console.log(res.data.user);
 
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
                 username,
                 email,
                 uid
-            });
+            }, { withCredentials: true });
             console.log(res);
 
             setUser(res.data.user);
