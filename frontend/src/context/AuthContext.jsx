@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
                 username,
                 email,
                 password
-            });
+            }, { withCredentials: true });
             console.log(res);
 
             setUser(res.data.user);
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
                 username,
                 email,
                 uid
-            });
+            }, { withCredentials: true });
             console.log(res);
 
             setUser(res.data.user);
