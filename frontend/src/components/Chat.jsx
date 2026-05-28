@@ -182,7 +182,7 @@ const Chat = ({ width, socket, onlineUsers, room, user, getAvatarColor }) => {
       </div> */}
 
       {/* Input */}
-      <div style={{ padding: "8px 10px 10px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+      <div style={{ padding: "8px 10px 10px", borderTop: "4px solid rgba(255,255,255,0.04)" }}>
         <div style={{ display: "flex", gap: 6, alignItems: "flex-end" }}>
           <textarea
             className="ws-chat-input"
@@ -198,7 +198,7 @@ const Chat = ({ width, socket, onlineUsers, room, user, getAvatarColor }) => {
             onChange={(e) => setInput(e.target.value)}
           />
           <button className="btn-primary" onClick={handleSendMessage} style={{
-            width: 32, height: 32, borderRadius: 8, padding: 0,
+            width: 45, height: 45, borderRadius: 8, padding: 0,
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>
             <SendIcon />

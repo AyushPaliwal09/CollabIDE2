@@ -20,7 +20,7 @@ import MainEditor from "../components/MainEditor.jsx";
 export default function Workspace() {
 
   // ── Panel state ────────────────────────────────────────────────────────────
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarTab, setSidebarTab] = useState("users");
   const [sidebarWidth, setSidebarWidth] = useState(220);   // icon strip (48) + panel
 
@@ -474,7 +474,7 @@ export default function Workspace() {
 
       background: "rgba(0,0,0,0.45)",
 
-      zIndex: 999998,
+      zIndex: 100,
     }}
   />
 )}
@@ -626,25 +626,26 @@ export default function Workspace() {
 
   <div
     style={{
-  width: isMobile ? "100vw" : chatWidth,
+  position: isMobile ? "fixed" : "relative",
+
+  top: isMobile ? "52px" : "auto",
+
+  left: 0,
+  right: 0,
+
+  bottom: isMobile ? "48px" : 0,
+
+  width: "100%",
 
   height: isMobile
-    ? "calc(100vh - 48px)"
+    ? "calc(100vh - 100px)"
     : "100%",
 
-  position: isMobile
-    ? "fixed"
-    : "relative",
-
-  top: isMobile ? 0 : "auto",
-
-  left: isMobile ? 0 : "auto",
-
-  zIndex: isMobile ? 999 : "auto",
+  overflow: "hidden",
 
   background: "#0B1020",
 
-  overflow: "hidden",
+  zIndex: 999,
 }}
   >
 
