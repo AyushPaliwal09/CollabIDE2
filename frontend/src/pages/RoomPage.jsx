@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuth } from "../context/AuthContext.jsx";
 import { io } from "socket.io-client";
+import toast from "react-hot-toast";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -131,6 +132,11 @@ export default function Workspace() {
       console.log("online users:", onlineUsers);
 
       socket.on("leave-room", handleLeaveRoom);
+      socket.on("user-left", ({ username }) => {
+        if (username !== user?.username) {
+          toast(`${username} left the room`);
+        }
+      });
       socket.on("disconnect", () => {
         console.log("Socket disconnected:", socket.id);
         handleLeaveRoom();
@@ -138,6 +144,8 @@ export default function Workspace() {
 
       return () => {
         socket.off("online-users", onOnline);
+        socket.off("user-left");
+        socket.off("disconnect");
       };
     }
     initSocket();
@@ -250,8 +258,9 @@ export default function Workspace() {
   const navigate = useNavigate();
   const handleLeave = async () => {
     const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/leave-room/${room._id}`)
-    socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId });
+    socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId, username: user.username });
     console.log("Leave room");
+    toast.success("You left the room");
     window.close();
 
     navigate("/dashboard")
@@ -320,35 +329,35 @@ export default function Workspace() {
 
   const [showModal, setShowModal] = useState(false);
 
-useEffect(() => {
-  // create one fake history entry
-  window.history.pushState(null, "", window.location.href);
-
-  const handleBack = () => {
-    // restore current page immediately
+  useEffect(() => {
+    // create one fake history entry
     window.history.pushState(null, "", window.location.href);
 
-    // open modal
-    setShowModal(true);
+    const handleBack = () => {
+      // restore current page immediately
+      window.history.pushState(null, "", window.location.href);
+
+      // open modal
+      setShowModal(true);
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
+
+  const handleStay = () => {
+    setShowModal(false);
   };
 
-  window.addEventListener("popstate", handleBack);
+  const handleLeaveRoom = async () => {
+    await handleLeave(); // your async leave function
 
-  return () => {
-    window.removeEventListener("popstate", handleBack);
+    // navigate manually
+    navigate("/dashboard", { replace: true });
   };
-}, []);
-
-const handleStay = () => {
-  setShowModal(false);
-};
-
-const handleLeaveRoom = async () => {
-  await handleLeave(); // your async leave function
-
-  // navigate manually
-  navigate("/dashboard", { replace: true });
-};
 
   // useEffect(() => {
 
@@ -383,7 +392,13 @@ const handleLeaveRoom = async () => {
     const index = Math.abs(hash) % colors.length;
     return colors[index];
   };
-
+const [chatOpen, setChatOpen] = useState(true);
+const [language, setLanguage] = useState("javascript");
+const [showDropdown, setShowDropdown] = useState(false);
+const codeRef = useRef(`/*
+ Welcome to the CollabIDE!
+ Start Coding together in real-time with your friends.
+*/`);
 
   return (
     <>
@@ -402,6 +417,10 @@ const handleLeaveRoom = async () => {
           onlineUsers={onlineUsers}
           getAvatarColor={getAvatarColor}
           getFirstLetter={getFirstLetter}
+          language={language}
+          setLanguage={setLanguage}
+          showDropdown={showDropdown}
+          setShowDropdown={setShowDropdown}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
@@ -446,7 +465,7 @@ const handleLeaveRoom = async () => {
 
               {/* Editor */}
               <div className="ws-editor-area" style={{ flex: 1 }}>
-                <MainEditor room={room} currentLang={currentLang} socket={socketRef.current} />
+                <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} />
               </div>
 
               {/* Terminal resize handle */}
@@ -463,6 +482,9 @@ const handleLeaveRoom = async () => {
                   height={terminalH}
                   termTab={termTab}
                   onTermTab={setTermTab}
+                  setTerminalOpen={setTerminalOpen}
+                  codeRef={codeRef}
+                  language={language}
                 />
               )}
             </div>
@@ -475,8 +497,89 @@ const handleLeaveRoom = async () => {
           />
 
           {/* ── Chat panel ──────────────────────────────────────────── */}
-          {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}
+          {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}<>
+  {chatOpen ? (
+
+    <div style={{ position: "relative" }}>
+
+      {/* Close Button */}
+      <button
+        onClick={() => setChatOpen(false)}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 8,
+          zIndex: 20,
+
+          width: 28,
+          height: 28,
+
+          border: "none",
+          borderRadius: 8,
+
+          background: "rgba(17,24,39,0.9)",
+          color: "#9CA3AF",
+
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          cursor: "pointer",
+        }}
+      >
+        ✕
+      </button>
           <Chat width={chatWidth} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
+    </div>
+
+  ) : (
+
+    /* Floating Chat Button */
+    <button
+      onClick={() => setChatOpen(true)}
+      style={{
+        position: "fixed",
+        bottom: 35,
+        right: 35,
+
+        width: 46,
+        height: 46,
+
+        borderRadius: "50%",
+        border: "none",
+
+        background: "#7C3AED",
+        color: "white",
+
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+
+        cursor: "pointer",
+
+        boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+
+        zIndex: 999,
+      }}
+    >
+
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+
+    </button>
+
+  )}
+</>
 
         </div>
 
@@ -500,45 +603,45 @@ const handleLeaveRoom = async () => {
             </div>
           ))}
         </div>
-        
+
 
       </div>
-      
+
       {
-  showModal && (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      
-      <div className="bg-white p-5 rounded-xl w-[300px]">
-        
-        <h2 className="text-xl font-semibold">
-          Leave Room?
-        </h2>
+        showModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
 
-        <p className="mt-2 text-gray-600">
-          Are you sure you want to leave this room?
-        </p>
+            <div className="bg-white p-5 rounded-xl w-[300px]">
 
-        <div className="flex justify-end gap-3 mt-5">
-          
-          <button
-            onClick={() => setShowModal(false)}
-            className="px-4 py-2 bg-gray-300 rounded"
-          >
-            Cancel
-          </button>
+              <h2 className="text-xl font-semibold">
+                Leave Room?
+              </h2>
 
-          <button
-            onClick={handleLeaveRoom}
-            className="px-4 py-2 bg-red-500 text-white rounded"
-          >
-            Leave
-          </button>
+              <p className="mt-2 text-gray-600">
+                Are you sure you want to leave this room?
+              </p>
 
-        </div>
-      </div>
-    </div>
-  )
-}
+              <div className="flex justify-end gap-3 mt-5">
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleLeaveRoom}
+                  className="px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Leave
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )
+      }
       {modal === "settings" && <SettingsModal onClose={closeModal} />}
 
     </>

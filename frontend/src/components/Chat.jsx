@@ -75,28 +75,101 @@ const Chat = ({ width, socket, onlineUsers, room, user, getAvatarColor }) => {
         </div>
       </div>
 
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "12px 10px" }}>
-        {msgs.map(msg => (
-          <div key={msg.id} className="ws-chat-msg" style={{ alignItems: msg.mine ? "flex-end" : "flex-start" }}>
-            {!msg.mine && (
-              <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                <div style={{ width: 16, height: 16, borderRadius: "50%", background: msg.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, color: "#fff", fontWeight: 700 }}>
-                  {msg.user[0]}
-                </div>
-                <span style={{ fontSize: 10, color: "#4B5563" }}>{msg.user}</span>
-                <span style={{ fontSize: 9, color: "#374151" }}>{msg.time}</span>
-              </div>
-            )}
-            <div className={`ws-chat-bubble ${msg.mine ? "mine" : "other"}`}>
-              {msg.text}
-            </div>
-            {msg.mine && (
-              <span style={{ fontSize: 9, color: "#374151", marginTop: 3 }}>{msg.time}</span>
-            )}
-          </div>
-        ))}
+      {/* {/* Messages */}
+<div style={{ flex: 1, overflowY: "auto", padding: "12px 10px" }}>
 
+  {msgs.length === 0 ? (
+
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+      }}
+    >
+
+      <div
+        style={{
+          width: 58,
+          height: 58,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 14,
+        }}
+      >
+        <svg
+          width="26"
+          height="26"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#6B7280"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      </div>
+
+      <h2
+        style={{
+          color: "#D1D5DB",
+          fontSize: "1rem",
+          fontWeight: 600,
+          marginBottom: 4,
+        }}
+      >
+        Start Chatting
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+          fontSize: "0.78rem",
+        }}
+      >
+        No messages yet
+      </p>
+
+    </div>
+
+  ) : (
+
+    msgs.map(msg => (
+      <div key={msg.id} className="ws-chat-msg" style={{ alignItems: msg.mine ? "flex-end" : "flex-start" }}>
+        {!msg.mine && (
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+            <div style={{ width: 16, height: 16, borderRadius: "50%", background: msg.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, color: "#fff", fontWeight: 700 }}>
+              {msg.user[0]}
+            </div>
+            <span style={{ fontSize: 10, color: "#4B5563" }}>{msg.user}</span>
+            <span style={{ fontSize: 9, color: "#374151" }}>{msg.time}</span>
+          </div>
+        )}
+
+        <div className={`ws-chat-bubble ${msg.mine ? "mine" : "other"}`}>
+          {msg.text}
+        </div>
+
+        {msg.mine && (
+          <span style={{ fontSize: 9, color: "#374151", marginTop: 3 }}>
+            {msg.time}
+          </span>
+        )}
+      </div>
+    ))
+
+  )}
+
+  <div ref={bottomRef} />
+</div>
         {/* Typing indicator */}
         {/* <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
           <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#EC4899", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, color: "#fff", fontWeight: 700 }}>S</div>
@@ -104,9 +177,9 @@ const Chat = ({ width, socket, onlineUsers, room, user, getAvatarColor }) => {
             <span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" />
           </div>
         </div> */}
-
+{/* 
         <div ref={bottomRef} />
-      </div>
+      </div> */}
 
       {/* Input */}
       <div style={{ padding: "8px 10px 10px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>

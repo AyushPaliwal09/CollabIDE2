@@ -84,7 +84,7 @@ socket.on("chat-message", ({ roomId, message, user }) => {
   });
 
   // leave room
-  socket.on("leave-room", ({ roomId, userId }) => {
+  socket.on("leave-room", ({ roomId, userId, username }) => {
 
     socket.leave(roomId);
 
@@ -94,11 +94,14 @@ socket.on("chat-message", ({ roomId, message, user }) => {
       if (userIndex !== -1) {
         const user = rooms[roomId].users[userIndex]; // get the user that left
         rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
-        io.to(roomId).emit("user-left", user.id); // notify others in the room
+        // io.to(roomId).emit("user-left", user.id); // notify others in the room
       }
     }
 
-    io.to(roomId).emit("user-left", userId);
+    // io.to(roomId).emit("user-left", userId);
+     socket.to(roomId).emit("user-left", {
+    username,
+  });
   });
 
   socket.on("disconnect", () => {
@@ -109,7 +112,7 @@ socket.on("chat-message", ({ roomId, message, user }) => {
       if (userIndex !== -1) {
         const user = rooms[roomId].users[userIndex]; // get the user that left
         rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
-        io.to(roomId).emit("user-left", user.id); // notify others in the room
+        // io.to(roomId).emit("user-left", user.id); // notify others in the room
       }
     }
   });

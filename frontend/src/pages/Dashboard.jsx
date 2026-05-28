@@ -11,6 +11,7 @@ import { ROOMS } from "../data/Room.js";
 import DashboardNavbar from "../components/DashboardNavbar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
@@ -43,7 +44,8 @@ export default function Dashboard() {
     try{
       var room = rooms.find(r => r._id === roomId);
       if(!room){
-        alert("Room not found");
+        // alert("Room not found");
+        toast.error("Room not found");
         return;
       }
       const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/rejoin-room/${roomId}`);
@@ -52,7 +54,9 @@ export default function Dashboard() {
       // window.open(`/room/roompage/${res.data.room._id}`, "_blank");
     } catch (error) {
       console.error("Error finding room:", error);
-      alert("Error occurred while trying to join the room");
+      // alert("Error occurred while trying to join the room");
+      toast.error(`You are already joined, 
+        leave the room first to join again`);
     }
 
     // navigate(`/room/roompage/${roomId}`, {state: {roomData: room}});

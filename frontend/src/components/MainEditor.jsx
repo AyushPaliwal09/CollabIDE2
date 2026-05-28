@@ -3,8 +3,8 @@ import axios from "axios";
 import { use, useEffect, useState } from "react";
 import React from 'react'
 
-const MainEditor = ({ room, currentLang , socket }) => {
-    const [code, setCode] = useState(JSON.parse(localStorage.getItem(`code_${room?._id}`)) || room?.code || "");
+const MainEditor = ({ room, codeRef, currentLang, socket }) => {
+    const [code, setCode] = useState(room?.code || codeRef.current || "");
     console.log("room in MainEditor", room);
     useEffect(() => {
         if (!room?._id) return;
@@ -19,26 +19,52 @@ const MainEditor = ({ room, currentLang , socket }) => {
 
     const saveCode = async () => {
         try {
-            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/room/update-room-code/${room._id}`, { code });
+            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/room/update-room-code/${room._id}`, { code: codeRef.current });
             console.log("Code saved successfully");
         } catch (error) {
             console.error("Error saving code:", error);
         }
     };
-    useEffect(() => {
-        if (!socket) return;
-        const onCode = (serverCode) => setCode(serverCode ?? ""); 
-        socket.on("update-code", onCode);
-        return () => socket.off("update-code", onCode);
-    }, [socket]);
+//     useEffect(() => {
+//         if (!socket) return;
+//         // const onCode = (serverCode) => setCode(serverCode ?? "");
+//         const onCode = (serverCode) => {
+
+//   setCode(serverCode ?? "");
+
+//   codeRef.current = serverCode ?? "";
+// }; 
+//         socket.on("update-code", onCode);
+//         return () => socket.off("update-code", onCode);
+//     }, [socket]);
+useEffect(() => {
+
+  if (!socket) return;
+
+  const onCode = (serverCode) => {
+
+    setCode(serverCode ?? "");
+
+    codeRef.current = serverCode ?? "";
+  };
+
+  socket.on("update-code", onCode);
+
+  return () => {
+    socket.off("update-code", onCode);
+  };
+
+}, [socket]);
 
     console.log("socket in MainEditor", socket);   
      const handleCodeChange = (value) => {
         // if (!isEditor) return;
         setCode(value);
+        if (socket) socket.emit("code-change", {roomId : room?._id, code: value });
+
+        codeRef.current = value;
         // localStorage.setItem(`code_${room?._id}`, JSON.stringify(value));
         // if (socketRef) socketRef.emit("code-change", { roomId, code: value });
-        if (socket) socket.emit("code-change", {roomId : room?._id, code: value });
     
       }; 
 

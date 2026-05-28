@@ -3,6 +3,7 @@ import { UsersIcon } from "./ui/Icons.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import {toast} from "react-hot-toast";
 
 const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
   // const now = new Date();
@@ -30,10 +31,11 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
       console.log(room);
       
       // alert("Room deleted successfully");
+      toast.success("Room deleted successfully");
     } catch (error) {
       console.error("Error deleting room:", error);
-      alert("Failed to delete room");
-
+      // alert("Failed to delete room");
+      toast.error("Failed to delete room");
     }
   };
   return (
