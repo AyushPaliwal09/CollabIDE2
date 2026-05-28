@@ -806,7 +806,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.06);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      z-index: 50;
+      z-index: 9999999;
     }
  
     /* ── NEW: ws-body — main area below header ──────────────────────── */
@@ -1203,7 +1203,7 @@
     }
     @media (max-width: 767px) {
       .ws-mobile-tabs { display: flex; }
-      .ws-chat { display: none; }
+      /* .ws-chat { display: none; } */
       .ws-resize-v { display: none; }
       .ws-sidebar { display: none; }
       .ws-sidebar.mobile-open {
@@ -1325,4 +1325,27 @@
 
 .preview-open-btn:hover {
   background: rgba(31, 41, 55, 1);
+}
+@media (max-width: 767px) {
+
+  .ws-sidebar.mobile-open {
+    display: flex !important;
+
+    position: fixed;
+
+    top: 52px;
+    left: 0;
+
+    width: 240px !important;
+
+    height: calc(100vh - 52px);
+
+    z-index: 999999;
+
+    background: #0a0e1a;
+
+    box-shadow:
+      0 0 20px rgba(0,0,0,0.4);
+  }
+
 }

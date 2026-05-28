@@ -34,6 +34,9 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(
+  window.innerWidth <= 768
+);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   const socketRef = useRef(null);
@@ -203,6 +206,19 @@ export default function Workspace() {
   }, [sidebarOpen, sidebarWidth]);
 
   // ── Global mouse move / up ─────────────────────────────────────────────────
+ useEffect(() => {
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+    window.removeEventListener("resize", handleResize);
+  };
+
+}, []);
   useEffect(() => {
     console.log("useEffect for Chat resize")
     const onMove = (e) => {
@@ -392,10 +408,10 @@ export default function Workspace() {
     const index = Math.abs(hash) % colors.length;
     return colors[index];
   };
-const [chatOpen, setChatOpen] = useState(true);
-const [language, setLanguage] = useState("javascript");
-const [showDropdown, setShowDropdown] = useState(false);
-const codeRef = useRef(`/*
+  const [chatOpen, setChatOpen] = useState(true);
+  const [language, setLanguage] = useState("javascript");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const codeRef = useRef(`/*
  Welcome to the CollabIDE!
  Start Coding together in real-time with your friends.
 */`);
@@ -427,7 +443,15 @@ const codeRef = useRef(`/*
         <div className="ws-body">
 
           {/* ── Sidebar ─────────────────────────────────────────────── */}
-          <div className="ws-sidebar" style={{ width: totalSidebarW }}>
+          {/* <div className="ws-sidebar" style={{ width: totalSidebarW }}> */}
+         <div
+  className={`ws-sidebar ${
+    isMobile && sidebarOpen
+      ? "mobile-open"
+      : ""
+  }`}
+  style={{ width: totalSidebarW }}
+>
             <Sidebar
               open={sidebarOpen}
               activeTab={sidebarTab}
@@ -441,6 +465,19 @@ const codeRef = useRef(`/*
               getFirstLetter={getFirstLetter}
             />
           </div>
+          {isMobile && sidebarOpen && (
+  <div
+    onClick={() => setSidebarOpen(false)}
+    style={{
+      position: "fixed",
+      inset: 0,
+
+      background: "rgba(0,0,0,0.45)",
+
+      zIndex: 999998,
+    }}
+  />
+)}
 
           {/* Sidebar resize handle */}
           <div
@@ -450,34 +487,37 @@ const codeRef = useRef(`/*
           />
 
           {/* ── Editor column ───────────────────────────────────────── */}
-          <div className="ws-editor-col">
+          {/* <div className="ws-editor-col"> */}
 
-            {/* File tabs */}
-            {/* <TabsBar
+          {/* File tabs */}
+          {/* <TabsBar
               tabs={tabs}
               activeTab={activeTab}
               onTab={setActiveTab}
               onClose={closeTab}
             /> */}
 
-            {/* Monaco editor + terminal stacked */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
+          {/* Monaco editor + terminal stacked */}
+          {/* <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}> */}
 
-              {/* Editor */}
-              <div className="ws-editor-area" style={{ flex: 1 }}>
-                <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} />
-              </div>
+          {/* Editor */}
+          {/* <div className="ws-editor-area" style={{ flex: 1 }}>
+                {/* <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} /> */}
+          {/* {mobilePanelIdx === 0 && (
+                  <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} />
+                )}
+              </div> */}
 
-              {/* Terminal resize handle */}
-              {terminalOpen && (
+          {/* Terminal resize handle */}
+          {/* {terminalOpen && (
                 <div
                   className="ws-resize-h"
                   onMouseDown={onTermMouseDown}
                 />
-              )}
+              )} */}
 
-              {/* Terminal */}
-              {terminalOpen && (
+          {/* Terminal */}
+          {/* {terminalOpen && (
                 <Terminal
                   height={terminalH}
                   termTab={termTab}
@@ -488,7 +528,57 @@ const codeRef = useRef(`/*
                 />
               )}
             </div>
-          </div>
+          </div> */}
+          {/* ── Editor column ───────────────────────────────────────── */}
+          {(!isMobile || mobilePanelIdx === 0) && (
+            <div className="ws-editor-col">
+
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                  minHeight: 0
+                }}
+              >
+
+                {/* Editor */}
+                <div
+                  className="ws-editor-area"
+                  style={{ flex: 1 }}
+                >
+                  <MainEditor
+                    room={room}
+                    codeRef={codeRef}
+                    currentLang={language}
+                    socket={socketRef.current}
+                  />
+                </div>
+
+                {/* Terminal resize handle */}
+                {terminalOpen && (
+                  <div
+                    className="ws-resize-h"
+                    onMouseDown={onTermMouseDown}
+                  />
+                )}
+
+                {/* Terminal */}
+                {terminalOpen && (
+                  <Terminal
+                    height={terminalH}
+                    termTab={termTab}
+                    onTermTab={setTermTab}
+                    setTerminalOpen={setTerminalOpen}
+                    codeRef={codeRef}
+                    language={language}
+                  />
+                )}
+
+              </div>
+            </div>
+          )}
 
           {/* Chat resize handle */}
           <div
@@ -498,88 +588,132 @@ const codeRef = useRef(`/*
 
           {/* ── Chat panel ──────────────────────────────────────────── */}
           {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}<>
-  {chatOpen ? (
+            {chatOpen ? (
 
-    <div style={{ position: "relative" }}>
+              <div style={{ position: "relative" }}>
 
-      {/* Close Button */}
-      <button
-        onClick={() => setChatOpen(false)}
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          zIndex: 20,
+                {/* Close Button */}
+                {!isMobile && (
+                  <button
+                    onClick={() => setChatOpen(false)}
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      zIndex: 20,
 
-          width: 28,
-          height: 28,
+                      width: 28,
+                      height: 28,
 
-          border: "none",
-          borderRadius: 8,
+                      border: "none",
+                      borderRadius: 8,
 
-          background: "rgba(17,24,39,0.9)",
-          color: "#9CA3AF",
+                      background: "rgba(17,24,39,0.9)",
+                      color: "#9CA3AF",
 
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
 
-          cursor: "pointer",
-        }}
-      >
-        ✕
-      </button>
-          <Chat width={chatWidth} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
-    </div>
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
 
-  ) : (
+               {(!isMobile || mobilePanelIdx === 1) && (
 
-    /* Floating Chat Button */
-    <button
-      onClick={() => setChatOpen(true)}
-      style={{
-        position: "fixed",
-        bottom: 35,
-        right: 35,
+  <div
+    style={{
+  width: isMobile ? "100vw" : chatWidth,
 
-        width: 46,
-        height: 46,
+  height: isMobile
+    ? "calc(100vh - 48px)"
+    : "100%",
 
-        borderRadius: "50%",
-        border: "none",
+  position: isMobile
+    ? "fixed"
+    : "relative",
 
-        background: "#7C3AED",
-        color: "white",
+  top: isMobile ? 0 : "auto",
 
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+  left: isMobile ? 0 : "auto",
 
-        cursor: "pointer",
+  zIndex: isMobile ? 999 : "auto",
 
-        boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+  background: "#0B1020",
 
-        zIndex: 999,
-      }}
-    >
+  overflow: "hidden",
+}}
+  >
 
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
+    <Chat
+      width="100%"
+      socket={socketRef.current}
+      onlineUsers={onlineUsers}
+      room={room}
+      user={user}
+      getAvatarColor={getAvatarColor}
+    />
 
-    </button>
+  </div>
 
-  )}
-</>
+)}
+              </div>
+
+            ) : (
+
+              <>
+                {/* Floating Chat Button */}
+                {!isMobile && (
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    style={{
+                      position: "fixed",
+                      bottom: 35,
+                      right: 35,
+
+                      width: 46,
+                      height: 46,
+
+                      borderRadius: "50%",
+                      border: "none",
+
+                      background: "#7C3AED",
+                      color: "white",
+
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+
+                      cursor: "pointer",
+
+                      boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+
+                      zIndex: 999,
+                    }}
+                  >
+
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+
+                  </button>
+                )}
+              </>
+
+            )}
+          </>
 
         </div>
 
@@ -596,7 +730,13 @@ const codeRef = useRef(`/*
             <div
               key={i}
               className={`ws-mobile-tab ${mobilePanelIdx === i ? "active" : ""}`}
-              onClick={() => setMobilePanelIdx(i)}
+              // onClick={() => setMobilePanelIdx(i)}
+              onTouchStart={() => setMobilePanelIdx(i)}
+              onClick={() => {
+                setMobilePanelIdx(i);
+                setChatOpen(i === 1);                    
+
+              }}
             >
               {t.icon}
               <span style={{ fontSize: 9, fontFamily: "DM Sans, sans-serif" }}>{t.label}</span>

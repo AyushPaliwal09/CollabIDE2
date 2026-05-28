@@ -9,7 +9,7 @@ import toast  from "react-hot-toast";
 const RoomHeader = ({ sidebarOpen,socket, onToggleSidebar, chatOpen, onToggleChat, room, handleLeave, onlineUsers, getAvatarColor, getFirstLetter, userId, language, setLanguage, showDropdown, setShowDropdown }) => {
   const navigate = useNavigate()
 const { user } = useAuth()
-
+const isMobile = window.innerWidth <= 768;
   const handleInvite = () => {
     try {
       const currentUrl = window.location.href;
@@ -52,7 +52,7 @@ const languages = [
         {sidebarOpen ? <ChevronLeft /> : <ChevronRight />}
       </button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+      {/* <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
         <div style={{
           width: 22, height: 22, borderRadius: 6,
           background: "linear-gradient(135deg,#8B5CF6,#EC4899)",
@@ -61,12 +61,78 @@ const languages = [
           fontFamily: "JetBrains Mono, monospace",
         }}>{"<>"}</div>
         <span className="font-display font-bold grad-text" style={{ fontSize: "0.82rem" }}>CollabIDE</span>
-      </div>
+      </div>*/}
+      <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    flexShrink: 0,
+  }}
+>
 
-      <div className="ws-sep" />
+  {/* Logo */}
+  <div
+    style={{
+      width: 22,
+      height: 22,
+      borderRadius: 6,
+
+      background:
+        "linear-gradient(135deg,#8B5CF6,#EC4899)",
+
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+
+      fontSize: 9,
+      fontWeight: 700,
+      color: "#fff",
+
+      fontFamily:
+        "JetBrains Mono, monospace",
+    }}
+  >
+    {"<>"}
+  </div>
+
+  {/* Desktop Name */}
+  {!isMobile && (
+    <span
+      className="font-display font-bold grad-text"
+      style={{ fontSize: "0.82rem" }}
+    >
+      CollabIDE
+    </span>
+  )}
+
+  {/* Mobile Room Name */}
+  {isMobile && (
+    <span
+      className="font-display font-semibold"
+      style={{
+        fontSize: "0.8rem",
+        color: "#E5E7EB",
+
+        maxWidth: 110,
+
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }}
+    >
+      {room?.roomName}
+    </span>
+  )}
+
+</div>
+
+      <div className="ws-sep" /> 
 
       {/* Room name + tag */}
-      <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
+      {/* <div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}> */}
+    {!isMobile && (
+<div style={{ display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
         <span className="font-display font-semibold" style={{ fontSize: "0.82rem", color: "#E5E7EB", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 160 }}>
           {room?.roomName}
         </span>
@@ -189,7 +255,7 @@ const languages = [
           <span style={{ fontSize: 10, color: "#22C55E", fontFamily: "JetBrains Mono, monospace", whiteSpace: "nowrap" }}>Live</span>
         </div>
       </div>
-
+)}
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
@@ -202,9 +268,22 @@ const languages = [
             {getFirstLetter(u.name)}
           </div>
         ))}
-        <span style={{ fontSize: 10, color: "#4B5563", marginLeft: 6, whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>
+        {/* <span style={{ fontSize: 10, color: "#4B5563", marginLeft: 6, whiteSpace: "nowrap", fontFamily: "JetBrains Mono, monospace" }}>
           {onlineUsers?.length} online
-        </span>
+        </span> */}
+        {!isMobile && (
+  <span
+    style={{
+      fontSize: 10,
+      color: "#4B5563",
+      marginLeft: 6,
+      whiteSpace: "nowrap",
+      fontFamily: "JetBrains Mono, monospace",
+    }}
+  >
+    {onlineUsers?.length} online
+  </span>
+)}
       </div>
 
       <div className="ws-sep" />
@@ -215,11 +294,13 @@ const languages = [
           <PlayIcon /> Run
         </button> */}
         <button className="ws-invite-btn" onClick={handleInvite}>
-          <LinkIcon /> Invite
-        </button>
+  <LinkIcon />
+  {!isMobile && " Invite"}
+</button>
         <button className="ws-leave-btn" onClick={handleLeave}>
-          <PowerIcon /> Leave
-        </button>
+  <PowerIcon />
+  {!isMobile && " Leave"}
+</button>
       </div>
     </header>
   )
