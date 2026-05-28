@@ -206,19 +206,19 @@ export default function Workspace() {
   }, [sidebarOpen, sidebarWidth]);
 
   // ── Global mouse move / up ─────────────────────────────────────────────────
- useEffect(() => {
+//  useEffect(() => {
 
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
+//   const handleResize = () => {
+//     setIsMobile(window.innerWidth <= 768);
+//   };
 
-  window.addEventListener("resize", handleResize);
+//   window.addEventListener("resize", handleResize);
 
-  return () => {
-    window.removeEventListener("resize", handleResize);
-  };
+//   return () => {
+//     window.removeEventListener("resize", handleResize);
+//   };
 
-}, []);
+// }, []);
   useEffect(() => {
     console.log("useEffect for Chat resize")
     const onMove = (e) => {
@@ -593,14 +593,17 @@ export default function Workspace() {
               <div style={{ position: "relative" }}>
 
                 {/* Close Button */}
-                {!isMobile && (
-                  <button
-                    onClick={() => setChatOpen(false)}
+                
+                  {/* <button
+                    onClick={() => {
+                      setChatOpen(false);
+                      setMobilePanelIdx(0);
+                    }}
                     style={{
                       position: "absolute",
                       top: 8,
                       right: 8,
-                      zIndex: 20,
+                      zIndex: 400,
 
                       width: 28,
                       height: 28,
@@ -610,7 +613,7 @@ export default function Workspace() {
 
                       background: "rgba(17,24,39,0.9)",
                       color: "#9CA3AF",
-
+                      
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -620,8 +623,7 @@ export default function Workspace() {
                   >
                     ✕
                   </button>
-                )}
-
+                  
                {(!isMobile || mobilePanelIdx === 1) && (
 
   <div
@@ -645,7 +647,7 @@ export default function Workspace() {
 
   background: "#0B1020",
 
-  zIndex: 999,
+  zIndex: 50,
 }}
   >
 
@@ -665,9 +667,9 @@ export default function Workspace() {
 
             ) : (
 
-              <>
+              <> */}
                 {/* Floating Chat Button */}
-                {!isMobile && (
+                {/* {!isMobile && (
                   <button
                     onClick={() => setChatOpen(true)}
                     style={{
@@ -715,6 +717,128 @@ export default function Workspace() {
 
             )}
           </>
+
+        </div> */}
+        
+      <button
+        onClick={() => {
+          setChatOpen(false);
+          setMobilePanelIdx(0);
+        }}
+        style={{
+  position: "fixed",
+
+  top: 60,
+  right: 12,
+
+  zIndex: 999999,
+
+  width: 32,
+  height: 32,
+
+  border: "none",
+  borderRadius: 8,
+
+  background: "rgba(17,24,39,0.95)",
+
+  color: "#9CA3AF",
+
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+
+  cursor: "pointer",
+
+  backdropFilter: "blur(8px)",
+}}
+      >
+        ✕
+      </button>
+
+    {(!isMobile || mobilePanelIdx === 1) && (
+      <div
+    style={{
+  position: isMobile ? "fixed" : "relative",
+
+  top: isMobile ? "52px" : "auto",
+
+  left: 0,
+  right: 0,
+
+  bottom: isMobile ? "52px" : 0,
+
+  width: "100%",
+
+  height: isMobile
+    ? "calc(100vh - 100px)"
+    : "100%",
+
+  overflow: "hidden",
+
+  background: "#0B1020",
+
+  zIndex: 50,
+}}
+  >
+      <Chat width={!isMobile ? chatWidth : "100%"} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
+      </div>
+
+    )}
+    </div>
+
+  ) : (
+
+    /* Floating Chat Button */
+    <>
+    {!isMobile && (
+    <button
+      onClick={() => {
+        setChatOpen(true);
+      }}
+      style={{
+        position: "fixed",
+        bottom: 35,
+        right: 35,
+
+        width: 46,
+        height: 46,
+
+        borderRadius: "50%",
+        border: "none",
+
+        background: "#7C3AED",
+        color: "white",
+
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+
+        cursor: "pointer",
+
+        boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+
+        zIndex: 999,
+      }}
+    >
+
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+
+    </button>
+    )}
+    </>
+  )}
+</>
 
         </div>
 

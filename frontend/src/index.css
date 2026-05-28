@@ -1209,7 +1209,7 @@
       .ws-sidebar.mobile-open {
         display: flex;
         position: absolute; top: 0; left: 0; bottom: 0;
-        z-index: 100; width: 240px !important;
+        z-index: 105; width: 240px !important;
       }
       .ws-room-header { padding: 0 10px; gap: 6px; }
       .ws-status-bar { display: none; }
@@ -1340,7 +1340,7 @@
 
     height: calc(100vh - 52px);
 
-    z-index: 25;
+    z-index: 600;
 
     background: #0a0e1a;
 
