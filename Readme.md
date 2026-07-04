@@ -1,7 +1,7 @@
 # 🚀 CollabIDE
 
 <p align="center">
-  <img src=".froutend/assets/images/banner.png" alt="CollabIDE Banner" width="100%">
+  <img src=".github/assets/images/banner.png" alt="CollabIDE Banner" width="100%">
 </p>
 
 <p align="center">
