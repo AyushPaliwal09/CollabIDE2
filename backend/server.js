@@ -7,6 +7,7 @@ import { connectDB } from "./db/connectDB.js"
 import userRouter from "./routes/user.route.js"
 import roomRouter from "./routes/room.route.js"
 import cookieParser from "cookie-parser"
+import { leaveRoomController } from "./controller/room.controller.js"
 
 
 dotenv.config()
@@ -17,8 +18,8 @@ const PORT = process.env.PORT
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    // methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "https://collabide-sjuu.onrender.com",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 })
@@ -83,13 +84,24 @@ socket.on("chat-message", ({ roomId, message, user }) => {
   });
 
   // leave room
-  socket.on("leave-room", ({ roomId, userId }) => {
+  socket.on("leave-room", ({ roomId, userId, username }) => {
 
     socket.leave(roomId);
 
     console.log(`${userId} left ${roomId}`);
+      for (const roomId in rooms) {
+      const userIndex = rooms[roomId].users.findIndex(u => u.socket === socket.id); // find the user that left
+      if (userIndex !== -1) {
+        const user = rooms[roomId].users[userIndex]; // get the user that left
+        rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
+        // io.to(roomId).emit("user-left", user.id); // notify others in the room
+      }
+    }
 
-    io.to(roomId).emit("user-left", userId);
+    // io.to(roomId).emit("user-left", userId);
+     socket.to(roomId).emit("user-left", {
+    username,
+  });
   });
 
   socket.on("disconnect", () => {
@@ -100,7 +112,7 @@ socket.on("chat-message", ({ roomId, message, user }) => {
       if (userIndex !== -1) {
         const user = rooms[roomId].users[userIndex]; // get the user that left
         rooms[roomId].users.splice(userIndex, 1); // remove the user from the room
-        io.to(roomId).emit("user-left", user.id); // notify others in the room
+        // io.to(roomId).emit("user-left", user.id); // notify others in the room
       }
     }
   });
@@ -110,9 +122,27 @@ socket.on("chat-message", ({ roomId, message, user }) => {
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
+  origin: [
+  "http://localhost:5173",
+  "https://collabide-sjuu.onrender.com"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  // allowedHeaders: ["Content-Type", "Authorization"]
 }));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://collabide-sjuu.onrender.com");
+  // res.header("Access-Control-Allow-Headers", "*");
+  // res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+app.set("trust proxy", 1);
+app.use(cors());
 app.use("/api/auth", userRouter)
 app.use("/room", roomRouter)
 app.get("/",(req,res)=> res.send("Hello there"))

@@ -6,6 +6,7 @@ import {Routes, Route} from 'react-router-dom'
 import Dashboard from './pages/Dashboard.jsx'
 import JoinRoomModal from './components/JoinRoomModal.jsx'
 import RoomPage from './pages/RoomPage.jsx'
+import { Toaster } from "react-hot-toast";
 
 import { AuthProvider } from './context/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
@@ -28,7 +29,7 @@ function App() {
         </Routes>
        </div>
      </AuthProvider>
-
+     <Toaster />
     </>
   )
 }

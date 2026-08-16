@@ -23,7 +23,7 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
       return alert("please fill all the fields")
     }
     try {
-      const res = await axios.post("http://localhost:5000/room/create-room",{
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/create-room`,{
        roomName: roomData.roomName,
        description: roomData.description,
         interviewMode: interviewMode
@@ -36,7 +36,9 @@ const CreateRoomModal = ({ onClose, setRefreshRooms }) => {
   )
       console.log("room card room data: ", res.data.data);
       setRefreshRooms(prev => prev + 1);
+      onClose();
       navigate("/room/roompage/"+ res.data.data._id, {state: {roomData: res.data.data}});
+      // window.open(`/room/roompage/${res.data.data._id}`, "_blank");
     } catch (error) {
       console.log("error in createRoom", error.message);
       

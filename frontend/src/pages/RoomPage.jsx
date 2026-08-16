@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuth } from "../context/AuthContext.jsx";
 import { io } from "socket.io-client";
+import toast from "react-hot-toast";
 import Chat from "../components/Chat.jsx";
 import RoomHeader from "../components/RoomHeader.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -19,7 +20,7 @@ import MainEditor from "../components/MainEditor.jsx";
 export default function Workspace() {
 
   // ── Panel state ────────────────────────────────────────────────────────────
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarTab, setSidebarTab] = useState("users");
   const [sidebarWidth, setSidebarWidth] = useState(220);   // icon strip (48) + panel
 
@@ -33,6 +34,9 @@ export default function Workspace() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(
+  window.innerWidth <= 768
+);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   const socketRef = useRef(null);
@@ -92,8 +96,8 @@ export default function Workspace() {
     console.log("useEffect for room data and socket connection")
     async function fetchRoom() {
       const res = await axios.get(
-        `http://localhost:5000/room/get-room/${roomId}`,
-        { withCredentials: true }
+        `${import.meta.env.VITE_BACKEND_URL}/room/get-room/${roomId}`,
+        // { withCredentials: true }
       );
 
       setRoom(res.data);
@@ -108,8 +112,8 @@ export default function Workspace() {
 
     const initSocket = () => {
       if (!socketRef.current) {
-        socketRef.current = io("http://localhost:5000", {
-          withCredentials: true,
+        socketRef.current = io(`${import.meta.env.VITE_BACKEND_URL}`, {
+          // withCredentials: true,
           transports: ["websocket"],
           forceNew: true,
         });
@@ -129,11 +133,22 @@ export default function Workspace() {
       const onOnline = (users) => setOnlineUsers(users || []);
       socket.on("online-users", onOnline);
       console.log("online users:", onlineUsers);
-     
-  
+
+      socket.on("leave-room", handleLeaveRoom);
+      socket.on("user-left", ({ username }) => {
+        if (username !== user?.username) {
+          toast(`${username} left the room`);
+        }
+      });
+      socket.on("disconnect", () => {
+        console.log("Socket disconnected:", socket.id);
+        handleLeaveRoom();
+      });
 
       return () => {
         socket.off("online-users", onOnline);
+        socket.off("user-left");
+        socket.off("disconnect");
       };
     }
     initSocket();
@@ -191,6 +206,19 @@ export default function Workspace() {
   }, [sidebarOpen, sidebarWidth]);
 
   // ── Global mouse move / up ─────────────────────────────────────────────────
+//  useEffect(() => {
+
+//   const handleResize = () => {
+//     setIsMobile(window.innerWidth <= 768);
+//   };
+
+//   window.addEventListener("resize", handleResize);
+
+//   return () => {
+//     window.removeEventListener("resize", handleResize);
+//   };
+
+// }, []);
   useEffect(() => {
     console.log("useEffect for Chat resize")
     const onMove = (e) => {
@@ -245,9 +273,11 @@ export default function Workspace() {
 
   const navigate = useNavigate();
   const handleLeave = async () => {
-    const res = await axios.post(`http://localhost:5000/room/leave-room/${room._id}`)
-    socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId });
+    const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/leave-room/${room._id}`)
+    socketRef.current.emit("leave-room", { roomId: room._id, userID: user.userId, username: user.username });
     console.log("Leave room");
+    toast.success("You left the room");
+    window.close();
 
     navigate("/dashboard")
   }
@@ -268,19 +298,97 @@ export default function Workspace() {
   //   window.history.pushState(null, "", window.location.href);
 
   //   const handleBack = async () => {
-  //     // const confirmLeave = window.confirm(
-  //     //   "Do you want to leave the room?"
-  //     // );
+  //     const confirmLeave = window.confirm(
+  //       "Do you want to leave the room?"
+  //     );
 
-  //     // if (confirmLeave) {
+  //     if (confirmLeave) {
   //       await handleLeave();
   //       navigate("/dashboard"); // where you want to go
-  //     // } else {
+  //     } else {
   //       // stay on same page
   //       window.history.pushState(null, "", window.location.href);
   //     }
+  //   }
 
 
+  // }, []);
+
+  // useEffect(() => {
+  //   // keep current page in history
+  //   window.history.pushState(null, "", window.location.href);
+
+  //   const handleBack = async () => {
+  //     const confirmLeave = window.confirm(
+  //       "Do you want to leave the room?"
+  //     );
+
+  //     if (confirmLeave) {
+  //       window.removeEventListener("popstate", handleBack);
+
+  //       await handleLeave();
+  //       // navigate("/dashboard"); // where you want to go
+  //       window.history.back();
+
+  //     } else {
+  //       // stay on same page
+  //       window.history.pushState(null, "", window.location.href);
+  //     }
+  //   };
+
+  //   window.addEventListener("popstate", handleBack);
+
+  //   return () => {
+  //     window.removeEventListener("popstate", handleBack);
+  //   };
+  // }, []);
+
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // create one fake history entry
+    window.history.pushState(null, "", window.location.href);
+
+    const handleBack = () => {
+      // restore current page immediately
+      window.history.pushState(null, "", window.location.href);
+
+      // open modal
+      setShowModal(true);
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
+
+  const handleStay = () => {
+    setShowModal(false);
+  };
+
+  const handleLeaveRoom = async () => {
+    await handleLeave(); // your async leave function
+
+    // navigate manually
+    navigate("/dashboard", { replace: true });
+  };
+
+  // useEffect(() => {
+
+  //   const handleBeforeUnload = () => {
+  //     handleLeave();
+  //   };
+
+  //   window.addEventListener("unload", handleBeforeUnload);
+
+  //   return () => {
+  //     window.removeEventListener(
+  //       "unload",
+  //       handleBeforeUnload
+  //     );
+  //   };
 
   // }, []);
 
@@ -300,7 +408,13 @@ export default function Workspace() {
     const index = Math.abs(hash) % colors.length;
     return colors[index];
   };
-
+  const [chatOpen, setChatOpen] = useState(true);
+  const [language, setLanguage] = useState("javascript");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const codeRef = useRef(`/*
+ Welcome to the CollabIDE!
+ Start Coding together in real-time with your friends.
+*/`);
 
   return (
     <>
@@ -319,13 +433,25 @@ export default function Workspace() {
           onlineUsers={onlineUsers}
           getAvatarColor={getAvatarColor}
           getFirstLetter={getFirstLetter}
+          language={language}
+          setLanguage={setLanguage}
+          showDropdown={showDropdown}
+          setShowDropdown={setShowDropdown}
         />
 
         {/* ── Body ────────────────────────────────────────────────────── */}
         <div className="ws-body">
 
           {/* ── Sidebar ─────────────────────────────────────────────── */}
-          <div className="ws-sidebar" style={{ width: totalSidebarW }}>
+          {/* <div className="ws-sidebar" style={{ width: totalSidebarW }}> */}
+         <div
+  className={`ws-sidebar ${
+    isMobile && sidebarOpen
+      ? "mobile-open"
+      : ""
+  }`}
+  style={{ width: totalSidebarW }}
+>
             <Sidebar
               open={sidebarOpen}
               activeTab={sidebarTab}
@@ -339,6 +465,19 @@ export default function Workspace() {
               getFirstLetter={getFirstLetter}
             />
           </div>
+          {isMobile && sidebarOpen && (
+  <div
+    onClick={() => setSidebarOpen(false)}
+    style={{
+      position: "fixed",
+      inset: 0,
+
+      background: "rgba(0,0,0,0.45)",
+
+      zIndex: 100,
+    }}
+  />
+)}
 
           {/* Sidebar resize handle */}
           <div
@@ -348,42 +487,98 @@ export default function Workspace() {
           />
 
           {/* ── Editor column ───────────────────────────────────────── */}
-          <div className="ws-editor-col">
+          {/* <div className="ws-editor-col"> */}
 
-            {/* File tabs */}
-            {/* <TabsBar
+          {/* File tabs */}
+          {/* <TabsBar
               tabs={tabs}
               activeTab={activeTab}
               onTab={setActiveTab}
               onClose={closeTab}
             /> */}
 
-            {/* Monaco editor + terminal stacked */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
+          {/* Monaco editor + terminal stacked */}
+          {/* <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}> */}
 
-              {/* Editor */}
-              <div className="ws-editor-area" style={{ flex: 1 }}>
-                <MainEditor room={room} currentLang={currentLang} socket={socketRef.current} />
-              </div>
+          {/* Editor */}
+          {/* <div className="ws-editor-area" style={{ flex: 1 }}>
+                {/* <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} /> */}
+          {/* {mobilePanelIdx === 0 && (
+                  <MainEditor room={room} codeRef={codeRef} currentLang={language} socket={socketRef.current} />
+                )}
+              </div> */}
 
-              {/* Terminal resize handle */}
-              {terminalOpen && (
+          {/* Terminal resize handle */}
+          {/* {terminalOpen && (
                 <div
                   className="ws-resize-h"
                   onMouseDown={onTermMouseDown}
                 />
-              )}
+              )} */}
 
-              {/* Terminal */}
-              {terminalOpen && (
+          {/* Terminal */}
+          {/* {terminalOpen && (
                 <Terminal
                   height={terminalH}
                   termTab={termTab}
                   onTermTab={setTermTab}
+                  setTerminalOpen={setTerminalOpen}
+                  codeRef={codeRef}
+                  language={language}
                 />
               )}
             </div>
-          </div>
+          </div> */}
+          {/* ── Editor column ───────────────────────────────────────── */}
+          {(!isMobile || mobilePanelIdx === 0) && (
+            <div className="ws-editor-col">
+
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                  minHeight: 0
+                }}
+              >
+
+                {/* Editor */}
+                <div
+                  className="ws-editor-area"
+                  style={{ flex: 1 }}
+                >
+                  <MainEditor
+                    room={room}
+                    codeRef={codeRef}
+                    currentLang={language}
+                    socket={socketRef.current}
+                  />
+                </div>
+
+                {/* Terminal resize handle */}
+                {terminalOpen && (
+                  <div
+                    className="ws-resize-h"
+                    onMouseDown={onTermMouseDown}
+                  />
+                )}
+
+                {/* Terminal */}
+                {terminalOpen && (
+                  <Terminal
+                    height={terminalH}
+                    termTab={termTab}
+                    onTermTab={setTermTab}
+                    setTerminalOpen={setTerminalOpen}
+                    codeRef={codeRef}
+                    language={language}
+                  />
+                )}
+
+              </div>
+            </div>
+          )}
 
           {/* Chat resize handle */}
           <div
@@ -392,8 +587,258 @@ export default function Workspace() {
           />
 
           {/* ── Chat panel ──────────────────────────────────────────── */}
-          {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}
-          <Chat width={chatWidth} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
+          {console.log("Rendering Chat with width:", chatWidth, "and socket:", socketRef, "user:", user)}<>
+            {chatOpen ? (
+
+              <div style={{ position: "relative" }}>
+
+                {/* Close Button */}
+                
+                  {/* <button
+                    onClick={() => {
+                      setChatOpen(false);
+                      setMobilePanelIdx(0);
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      zIndex: 400,
+
+                      width: 28,
+                      height: 28,
+
+                      border: "none",
+                      borderRadius: 8,
+
+                      background: "rgba(17,24,39,0.9)",
+                      color: "#9CA3AF",
+                      
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✕
+                  </button>
+                  
+               {(!isMobile || mobilePanelIdx === 1) && (
+
+  <div
+    style={{
+  position: isMobile ? "fixed" : "relative",
+
+  top: isMobile ? "52px" : "auto",
+
+  left: 0,
+  right: 0,
+
+  bottom: isMobile ? "48px" : 0,
+
+  width: "100%",
+
+  height: isMobile
+    ? "calc(100vh - 100px)"
+    : "100%",
+
+  overflow: "hidden",
+
+  background: "#0B1020",
+
+  zIndex: 50,
+}}
+  >
+
+    <Chat
+      width="100%"
+      socket={socketRef.current}
+      onlineUsers={onlineUsers}
+      room={room}
+      user={user}
+      getAvatarColor={getAvatarColor}
+    />
+
+  </div>
+
+)}
+              </div>
+
+            ) : (
+
+              <> */}
+                {/* Floating Chat Button */}
+                {/* {!isMobile && (
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    style={{
+                      position: "fixed",
+                      bottom: 35,
+                      right: 35,
+
+                      width: 46,
+                      height: 46,
+
+                      borderRadius: "50%",
+                      border: "none",
+
+                      background: "#7C3AED",
+                      color: "white",
+
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+
+                      cursor: "pointer",
+
+                      boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+
+                      zIndex: 999,
+                    }}
+                  >
+
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+
+                  </button>
+                )}
+              </>
+
+            )}
+          </>
+
+        </div> */}
+        
+      <button
+        onClick={() => {
+          setChatOpen(false);
+          setMobilePanelIdx(0);
+        }}
+        style={{
+  position: "fixed",
+
+  top: 60,
+  right: 12,
+
+  zIndex: 999999,
+
+  width: 32,
+  height: 32,
+
+  border: "none",
+  borderRadius: 8,
+
+  background: "rgba(17,24,39,0.95)",
+
+  color: "#9CA3AF",
+
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+
+  cursor: "pointer",
+
+  backdropFilter: "blur(8px)",
+}}
+      >
+        ✕
+      </button>
+
+    {(!isMobile || mobilePanelIdx === 1) && (
+      <div
+    style={{
+  position: isMobile ? "fixed" : "relative",
+
+  top: isMobile ? "52px" : "auto",
+
+  left: 0,
+  right: 0,
+
+  bottom: isMobile ? "52px" : 0,
+
+  width: "100%",
+
+  height: isMobile
+    ? "calc(100vh - 100px)"
+    : "100%",
+
+  overflow: "hidden",
+
+  background: "#0B1020",
+
+  zIndex: 50,
+}}
+  >
+      <Chat width={!isMobile ? chatWidth : "100%"} socket={socketRef.current} onlineUsers={onlineUsers} room={room} user={user} getAvatarColor={getAvatarColor} />
+      </div>
+
+    )}
+    </div>
+
+  ) : (
+
+    /* Floating Chat Button */
+    <>
+    {!isMobile && (
+    <button
+      onClick={() => {
+        setChatOpen(true);
+      }}
+      style={{
+        position: "fixed",
+        bottom: 35,
+        right: 35,
+
+        width: 46,
+        height: 46,
+
+        borderRadius: "50%",
+        border: "none",
+
+        background: "#7C3AED",
+        color: "white",
+
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+
+        cursor: "pointer",
+
+        boxShadow: "0 8px 25px rgba(124,58,237,0.4)",
+
+        zIndex: 999,
+      }}
+    >
+
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+
+    </button>
+    )}
+    </>
+  )}
+</>
 
         </div>
 
@@ -410,7 +855,13 @@ export default function Workspace() {
             <div
               key={i}
               className={`ws-mobile-tab ${mobilePanelIdx === i ? "active" : ""}`}
-              onClick={() => setMobilePanelIdx(i)}
+              // onClick={() => setMobilePanelIdx(i)}
+              onTouchStart={() => setMobilePanelIdx(i)}
+              onClick={() => {
+                setMobilePanelIdx(i);
+                setChatOpen(i === 1);                    
+
+              }}
             >
               {t.icon}
               <span style={{ fontSize: 9, fontFamily: "DM Sans, sans-serif" }}>{t.label}</span>
@@ -418,8 +869,44 @@ export default function Workspace() {
           ))}
         </div>
 
+
       </div>
 
+      {
+        showModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+
+            <div className="bg-white p-5 rounded-xl w-[300px]">
+
+              <h2 className="text-xl font-semibold">
+                Leave Room?
+              </h2>
+
+              <p className="mt-2 text-gray-600">
+                Are you sure you want to leave this room?
+              </p>
+
+              <div className="flex justify-end gap-3 mt-5">
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleLeaveRoom}
+                  className="px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Leave
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )
+      }
       {modal === "settings" && <SettingsModal onClose={closeModal} />}
 
     </>

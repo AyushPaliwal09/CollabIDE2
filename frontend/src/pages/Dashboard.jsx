@@ -11,6 +11,7 @@ import { ROOMS } from "../data/Room.js";
 import DashboardNavbar from "../components/DashboardNavbar.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
   const [modal, setModal] = useState(null); // null | "create" | "join" | "settings"
@@ -32,7 +33,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchRooms() {
       console.log("fetching rooms for user:", user._id);
-      const res = await axios.post(`http://localhost:5000/room/fetch-rooms/${user._id}`);
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/fetch-rooms/${user._id}`);
       setRooms(res.data);
       console.log("these are rooms",res.data);
       setHasRooms(res.data.length > 0);
@@ -43,15 +44,19 @@ export default function Dashboard() {
     try{
       var room = rooms.find(r => r._id === roomId);
       if(!room){
-        alert("Room not found");
+        // alert("Room not found");
+        toast.error("Room not found");
         return;
       }
-      const res = await axios.post(`http://localhost:5000/room/rejoin-room/${roomId}`)
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/room/rejoin-room/${roomId}`);
       console.log("res:", res);
       navigate("/room/roompage/"+ res.data.room._id, {state: {roomData: res.data.room}});
+      // window.open(`/room/roompage/${res.data.room._id}`, "_blank");
     } catch (error) {
       console.error("Error finding room:", error);
-      alert("Error occurred while trying to join the room");
+      // alert("Error occurred while trying to join the room");
+      toast.error(`You are already joined, 
+        leave the room first to join again`);
     }
 
     // navigate(`/room/roompage/${roomId}`, {state: {roomData: room}});

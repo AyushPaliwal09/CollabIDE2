@@ -3,6 +3,7 @@ import { UsersIcon } from "./ui/Icons.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import {toast} from "react-hot-toast";
 
 const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
   // const now = new Date();
@@ -25,15 +26,16 @@ const RoomCard = ({ room, delay, setRefreshRooms, onClick }) =>{
    const { roomId } = useParams();
   const handleDeleteRoom = async () => {
     try {
-      await axios.delete(`http://localhost:5000/room/delete-room/${room._id}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/room/delete-room/${room._id}`);
       setRefreshRooms(prev => prev + 1);
       console.log(room);
       
       // alert("Room deleted successfully");
+      toast.success("Room deleted successfully");
     } catch (error) {
       console.error("Error deleting room:", error);
-      alert("Failed to delete room");
-
+      // alert("Failed to delete room");
+      toast.error("Failed to delete room");
     }
   };
   return (
